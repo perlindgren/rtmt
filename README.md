@@ -29,7 +29,7 @@ In context of real-time communication, timelines is at any rate what counts, and
 - arbitrary preemption points (i.e, no critical sections on the sender side regarding the streaming output)
 - immediate frame reconstruction (i.e., as soon as the last byte of a frame has been received, the associated package can be immediately reconstructed even in presence of arbitrary preemptions)
 
-## Guarantees
+## Assumptions and Guarantees
 
 Sender side assumptions:
 
@@ -43,3 +43,11 @@ Frames can optionally have zero-sized payload (thus, `start_frame` followed by `
 This assumption adheres to Stack Resource Policy based scheduling, in essence we can see the transmission channel as a shared resource accessed preemptively in a nested fashion (which the highest priority always on top of the stack).  
 
 Due to the preemptive nature, even if the sender fails to call `end_frame`, the protocol is still operational. Any new frames (higher priority) started will be guaranteed to be transmitted and received. However, on-going transmissions that were preempted by the non-ending frame will not. This property ensures suitability to mixed critical systems, where highest priority transmissions can be guaranteed to succeed even in the presence of systems partially malfunctioning, (where some lower priority transmission task is failing).
+
+Receiver side assumptions:
+
+The implementation uses statically allocated single buffer sufficient parametric to the `MAX_FRAME_SIZE * PRIORITY_LEVELS`, which is sufficient in the worst case. Alternatively, the implementation could be based on dynamic allocations in order to accommodate to use.
+
+For each byte received, the `decode` function should be called. Regarding guarantees, the decoding is immediate (as soon as the frame marker is received the package is decoded and returned). The output buffer is dynamic, and holds all received frames. The user may call the `clear` function to reset the output buffer.
+
+Additional protocols can be built on-top of RT-COBS, e.g., piping data to different endpoints etc., but is out of scope for this discussion.
