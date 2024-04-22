@@ -73,8 +73,6 @@ impl Nc {
 
 #[cfg(test)]
 mod test {
-    // use std::collections::VecDeque;
-
     use super::*;
 
     #[test]
