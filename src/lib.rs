@@ -228,4 +228,32 @@ mod test {
         assert_eq!(nc.out_buf, [65, 0, 0].as_slice());
         println!("pkg {:?}", nc.out_buf);
     }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn decode_A0_0_a_preempt() {
+        let mut nc = Nc::new();
+        assert!(!nc.decode(65));
+
+        assert!(!nc.decode(1));
+
+        assert!(!nc.decode(97));
+        assert!(!nc.decode(2));
+        assert!(nc.decode(0)); // sentinel
+        assert_eq!(nc.out_buf, [97].as_slice());
+        println!("pkg {:?}", nc.out_buf);
+        nc.clear();
+
+        assert!(!nc.decode(-4i8 as u8));
+        assert!(nc.decode(0)); // sentinel
+        assert_eq!(nc.out_buf, [0].as_slice());
+        println!("pkg {:?}", nc.out_buf);
+        nc.clear();
+
+        assert!(!nc.decode(8));
+        assert!(!nc.decode(-1i8 as u8));
+        assert!(nc.decode(0)); // sentinel
+        assert_eq!(nc.out_buf, [65, 0].as_slice());
+        println!("pkg {:?}", nc.out_buf);
+    }
 }
