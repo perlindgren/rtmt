@@ -40,7 +40,7 @@ Sender side assumptions:
 
 Frames can optionally have zero-sized payload (thus, `start_frame` followed by `end_frame` is legal).
 
-This assumption adheres to Stack Resource Policy based scheduling, in essence we can see the transmission channel as a shared resource accessed preemptively in a nested fashion (which the highest priority always on top of the stack).  
+The LIFO assumption adheres to Stack Resource Policy based scheduling, in essence we can see the transmission channel as a shared resource accessed preemptively in a nested fashion (which the highest priority always on top of the stack).  
 
 Due to the preemptive nature, even if the sender fails to call `end_frame`, the protocol is still operational. Any new frames (higher priority) started will be guaranteed to be transmitted and received. However, on-going transmissions that were preempted by the non-ending frame will not. This property ensures suitability to mixed critical systems, where highest priority transmissions can be guaranteed to succeed even in the presence of systems partially malfunctioning, (where some lower priority transmission task is failing).
 
