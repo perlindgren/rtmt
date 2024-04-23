@@ -1,4 +1,4 @@
-//
-const SKIPPER: u8 = 5;
+// rmtm
 pub mod decode;
 pub mod encode;
+pub mod macros;

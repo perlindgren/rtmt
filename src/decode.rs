@@ -19,6 +19,7 @@ impl NcDecode {
 
     // clear output
     pub fn clear(&mut self) {
+        self.in_buf = Vec::new();
         self.out_buf = VecDeque::new();
     }
 

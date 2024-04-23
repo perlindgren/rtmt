@@ -1,6 +1,6 @@
+use rtmt::decode::NcDecode;
 use serial2::SerialPort;
 use std::time::Duration;
-
 // On Windows, use something like "COM1".
 // For COM ports above COM9, you need to use the win32 device namespace, for example "\\.\COM10" (or "\\\\.\\COM10" with string escaping).
 // For more details, see: https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file?redirectedfrom=MSDN#win32-device-namespaces
@@ -41,12 +41,25 @@ fn main() -> Result<(), std::io::Error> {
     //     }
     // }
 
+    let mut de = NcDecode::new();
+
     loop {
         match port.read(&mut buffer) {
-            Ok(0) => print!("[0]"),
+            Ok(0) => panic!("[0]"),
             Ok(n) => {
-                for i in &buffer[0..n] {
-                    print!("{:#03x} ", *i);
+                for b in &buffer[0..n] {
+                    print!("{:#03x} ", *b);
+                    if let Some(frame_start) = de.decode(*b as i8) {
+                        println!("frame_start {}", frame_start);
+                        let s: Vec<i8> = de.out_buf.clone().into();
+                        let s: Vec<u8> = s.iter().map(|i| *i as u8).collect();
+                        println!("---- bytes {:?}", s);
+
+                        // println!("---- str {:?}", std::str::from_utf8(&s));
+                        if frame_start == -1 {
+                            de.clear();
+                        }
+                    }
                 }
                 let _ = stdout().flush();
 

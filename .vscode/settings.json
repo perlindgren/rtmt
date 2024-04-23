@@ -2,7 +2,8 @@
   "cSpell.ignoreWords": [
     "Deque",
     "RTMT",
-    "rcobs"
+    "rcobs",
+    "rmtm"
   ],
   "cmake.configureOnOpen": false
 }

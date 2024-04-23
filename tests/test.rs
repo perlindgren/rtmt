@@ -208,29 +208,3 @@ fn encode_AD_B_C_preempt() {
 
     valid(&s, &[65, 68])
 }
-
-// assert_eq!(s, [65, 1, 97, 2, 0, -1, 0, 2, -1, 0].as_slice())
-
-// #[test]
-// #[allow(non_snake_case)]
-// fn encode_long_preempt() {
-//     let mut nc = NcEncode::new();
-//     let mut s = vec![];
-//     let mut v = vec![];
-//     nc.frame_begin();
-
-//     for i in 0..7 {
-//         s.append(&mut nc.encode(65 + i));
-//         v.push(65 + i);
-//     }
-//     s.append(&mut nc.frame_end());
-//     println!("s {:?}", s);
-
-//     let mut de = NcDecode::new();
-//     for d in s {
-//         de.decode(d as u8);
-//     }
-
-//     // assert_eq!(de.out_buf, [65u8, 66, 67].as_slice());
-//     println!("frame {:?}", de.out_buf);
-// }
