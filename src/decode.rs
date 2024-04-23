@@ -24,39 +24,30 @@ impl NcDecode {
 
     // scan frame recursively
     pub fn scan_frame(&mut self, mut p: i32, skip: bool) -> i32 {
-        println!("scan_frame p {}, skip {}", p, skip);
         let offset = self.in_buf[p as usize];
-        let mut is_end = offset > 0;
+        let mut is_next_end = offset > 0;
         let mut next: i32 = p - offset.abs() as i32;
         p -= 1;
 
         loop {
-            println!("loop: is_end {}, p {}, next {}", is_end, p, next);
-            if is_end && p == next {
-                println!("frame done p {}, frame {:?}", p, self.out_buf);
+            if is_next_end && p == next {
                 return p;
             }
 
             let data = self.in_buf[p as usize];
             if data == 0 {
-                println!("preemption package at p {}", p);
                 let new_p = self.scan_frame(p - 1, true);
                 next -= p - new_p;
                 p = new_p;
-                println!("continue");
                 continue;
             } else {
-                println!("p {}, next {}, data {}", p, next, data);
-
-                if p == next && !is_end {
+                if p == next && !is_next_end {
                     if !skip {
-                        println!("replace sentinel");
                         self.out_buf.push_front(0);
                     }
-                    is_end = data > 0;
+                    is_next_end = data > 0;
                     next -= data.abs() as i32;
                 } else if !skip {
-                    println!("----------- push data {}", data);
                     self.out_buf.push_front(data);
                 }
                 p -= 1;
@@ -64,19 +55,14 @@ impl NcDecode {
         }
     }
 
-    pub fn decode(&mut self, data: i8) -> bool {
-        let nc = self;
-        println!("data {}", data);
-        nc.in_buf.push(data);
+    pub fn decode(&mut self, data: i8) -> Option<i32> {
+        let de = self;
+        de.in_buf.push(data);
 
         if data == 0 {
-            println!("in_buf {:?}", nc.in_buf);
-            let r = nc.scan_frame((nc.in_buf.len() - 2) as i32, false);
-            println!("r {}", r);
-            true
+            Some(de.scan_frame((de.in_buf.len() - 2) as i32, false))
         } else {
-            false
+            None
         }
     }
 }
-
