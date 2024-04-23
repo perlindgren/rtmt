@@ -6,7 +6,7 @@ struct State {
     has_zero: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct NcEncode {
     states: Vec<State>,
 }
@@ -34,14 +34,14 @@ impl NcEncode {
 
         if let Some(outer_state) = self.states.last_mut() {
             println!("outer_state {:?}", outer_state);
-            outer_state.len += inner_state.len + 2;
+            // outer_state.len += inner_state.len + 2;
             println!("outer_state updated {:?}", outer_state);
         }
 
         vec![
             if inner_state.has_zero {
                 // length to zero
-                -(inner_state.len as i8)
+                -inner_state.len
             } else {
                 // length to start package
                 inner_state.len + 1
@@ -56,9 +56,9 @@ impl NcEncode {
         println!("encode data {}, state {:?}", data, state);
         if data == 0 {
             let len = if state.has_zero {
-                -(state.len as i8)
+                -state.len
             } else {
-                (state.len + 1) as i8
+                state.len + 1
             };
             state.len = 1;
 
@@ -160,7 +160,7 @@ mod test {
         s.push(nc.encode(66));
         s.append(&mut nc.frame_end());
         println!("s {:?}", s);
-        assert_eq!(s, [65, 97, 2, 0, 66, 6, 0].as_slice())
+        assert_eq!(s, [65, 97, 2, 0, 66, 3, 0].as_slice())
     }
 
     #[test]
@@ -177,7 +177,7 @@ mod test {
         s.push(nc.encode(66));
         s.append(&mut nc.frame_end());
         println!("s {:?}", s);
-        assert_eq!(s, [65, 1, 0, 66, 5, 0].as_slice())
+        assert_eq!(s, [65, 1, 0, 66, 3, 0].as_slice())
     }
 
     #[test]
@@ -195,7 +195,7 @@ mod test {
         s.push(nc.encode(0));
         s.append(&mut nc.frame_end());
         println!("s {:?}", s);
-        assert_eq!(s, [65, 1, -1, 0, 5, -1, 0].as_slice())
+        assert_eq!(s, [65, 1, -1, 0, 2, -1, 0].as_slice())
     }
 
     #[test]
@@ -220,7 +220,7 @@ mod test {
 
         s.append(&mut nc.frame_end());
         println!("s {:?}", s);
-        assert_eq!(s, [65, 1, -1, 0, 5, 1, -1, 0, -4, -1, 0].as_slice())
+        assert_eq!(s, [65, 1, -1, 0, 2, 1, -1, 0, -1, -1, 0].as_slice())
     }
 
     #[test]
@@ -240,9 +240,32 @@ mod test {
 
         s.append(&mut nc.frame_end());
 
-        s.push(nc.encode(0));
         s.append(&mut nc.frame_end());
         println!("s {:?}", s);
-        assert_eq!(s, [65, 1, 97, 2, 0, -4, 0, 8, -1, 0].as_slice())
+        assert_eq!(s, [65, 1, 97, 2, 0, -1, 0, 2, -1, 0].as_slice())
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn encode_AD_B_C_preempt() {
+        let mut nc = NcEncode::new();
+        let mut s = vec![];
+        nc.frame_begin();
+        s.push(nc.encode(65));
+
+        nc.frame_begin();
+        s.push(nc.encode(66));
+
+        nc.frame_begin();
+        s.push(nc.encode(67));
+        s.append(&mut nc.frame_end());
+
+        s.append(&mut nc.frame_end());
+
+        s.push(nc.encode(68));
+
+        s.append(&mut nc.frame_end());
+        println!("s {:?}", s);
+        assert_eq!(s, [65, 66, 67, 2, 0, 2, 0, 68, 3, 0].as_slice())
     }
 }

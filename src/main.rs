@@ -55,10 +55,9 @@ fn main() -> Result<(), std::io::Error> {
                 // }
             }
             Err(ref e) if e.kind() == std::io::ErrorKind::TimedOut => continue,
-            Err(e) => {
+            Err(_e) => {
                 eprintln!("Error: Failed to read ");
             }
         }
     }
-    Ok(())
 }
