@@ -18,9 +18,13 @@ impl NcDecode {
     }
 
     // clear output
-    pub fn clear(&mut self) {
-        self.in_buf = Vec::new();
+    pub fn clear_out(&mut self) {
         self.out_buf = VecDeque::new();
+    }
+
+    // clear input
+    pub fn clear_in(&mut self) {
+        self.in_buf = Vec::new();
     }
 
     // scan frame recursively

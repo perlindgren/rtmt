@@ -9,7 +9,7 @@ fn valid(de_in: &[i8], de_expected: &[i8]) {
         de.decode(*d);
     }
 
-    de.clear();
+    de.clear_out();
 
     assert_eq!(de.decode(de_in[de_in.len() - 1]), Option::Some(-1i32));
     assert_eq!(de.out_buf, de_expected);
@@ -97,6 +97,24 @@ fn encode_A_B_preempt() {
     s.append(&mut en.frame_end());
 
     valid(&s, &[65, 66]);
+}
+
+#[test]
+#[allow(non_snake_case)]
+fn encode_00_0_preempt() {
+    let mut en = NcEncode::new();
+    let mut s = vec![];
+    en.frame_begin();
+    s.push(en.encode(0));
+
+    en.frame_begin();
+    s.push(en.encode(0));
+    s.append(&mut en.frame_end());
+
+    s.push(en.encode(0));
+    s.append(&mut en.frame_end());
+
+    valid(&s, &[0, 0]);
 }
 
 #[test]

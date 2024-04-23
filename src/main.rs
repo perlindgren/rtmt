@@ -24,23 +24,12 @@ pub fn open() -> std::io::Result<SerialPort> {
     Ok(port)
 }
 
-// use std::io::Read;
-// use std::mem::size_of;
-
 use std::io::stdout;
 use std::io::Write;
 fn main() -> Result<(), std::io::Error> {
     let port = open()?;
 
     let mut buffer = [0; 256];
-    // loop {
-    //     if let Ok(read) = port.read(&mut buffer) {
-    //         if let Ok(s) = std::str::from_utf8(&buffer[0..read]) {
-    //             print!("{}", s);
-    //         }
-    //     }
-    // }
-
     let mut de = NcDecode::new();
 
     loop {
@@ -50,22 +39,16 @@ fn main() -> Result<(), std::io::Error> {
                 for b in &buffer[0..n] {
                     print!("{:#03x} ", *b);
                     if let Some(frame_start) = de.decode(*b as i8) {
-                        println!("frame_start {}", frame_start);
-                        let s: Vec<i8> = de.out_buf.clone().into();
-                        let s: Vec<u8> = s.iter().map(|i| *i as u8).collect();
-                        println!("---- bytes {:?}", s);
-
-                        // println!("---- str {:?}", std::str::from_utf8(&s));
+                        let s: Vec<u8> = de.out_buf.iter().map(|i| *i as u8).collect();
+                        println!("---- str {:?}", std::str::from_utf8(&s));
                         if frame_start == -1 {
-                            de.clear();
+                            // clear both receive buffer and output buffer
+                            // when outermost frame received
+                            de.clear_out();
                         }
                     }
                 }
                 let _ = stdout().flush();
-
-                // if let Ok(s) = std::str::from_utf8(&buffer[0..n]) {
-                //     println!("{}", s);
-                // }
             }
             Err(ref e) if e.kind() == std::io::ErrorKind::TimedOut => continue,
             Err(_e) => {

@@ -5,5 +5,8 @@
     "rcobs",
     "rmtm"
   ],
-  "cmake.configureOnOpen": false
+  "cmake.configureOnOpen": false,
+  "cSpell.words": [
+    "ncobs"
+  ]
 }

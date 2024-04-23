@@ -1,4 +1,6 @@
 // rmtm
 pub mod decode;
 pub mod encode;
-pub mod macros;
+
+// TODO: println! like functionality based on Write trait.
+// pub mod macros;
