@@ -168,3 +168,5 @@ The `127` (at index 129) now refers to `2`, which in turn holds the end of frame
 The crux here is that the encoder needs to know the size of the frame, to know where to inject the end of frame marker (the `2` at index 2 for the example), as there is no in place-method to back-patch the end-of frame marker in an online encoder.
 
 Notice, it is enough to know the frame size, we can still use an un-buffered encoder.The end of frame offset can be computed as size%126, while the number of chains is computed as size/126.
+
+In hindsight it might be preferable to swap offset signs, i.e., use negative offsets to end of frame. This way we may be able to pack one more byte into each frame (increasing payload from 126 to 127, but it has not been fully thought through.)
