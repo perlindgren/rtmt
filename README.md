@@ -61,56 +61,85 @@ Additional protocols can be built on-top of Nested COBS, e.g., piping data to di
 
 ### Frame Encoding
 
-Key to Nested cobs is the adoption of a *singed* byte offset for striding the receive input.
+For the presentation 0 is used as the frame sentinel, like COBS/rcobs any other value could be used as marker.
 
-1) | A | B | C |, will be encoded similarly to rcobs as:
+Key to Nested COBS is the adoption of a *signed* offsets for the encoding. A positive value is used to indicate the offset until end (start of frame), while a negative value gives the offset to next encoded 0.
 
-   | A | B | C | 4 (offset to start of frame + 1) | 0 |
+1) | 0 | 1 | 2 |
+   | - | - | - |
+   | A | B | C |
 
-2) | A | 0 | C |,  will be encoded as:
+   will be encoded similarly to rcobs as:
 
-   | A | 2 (offset to start of frame + 1) | C | -2 (negative offset to next 0) | 0 |
+   | 0 | 1 | 2 | 3 | 4 |
+   | - | - | - | - | - |
+   | A | B | C | 4 | 0 |
 
-3) ||, as:
+   where 4 (at index 3) is a *positive* signed offset to end (start of frame).
 
+2) | 0 | 1 | 2 |
+   | - | - | - |
+   | A | 0 | C |
+
+   will be encoded as:
+
+   | 0 | 1 | 2 | 3  | 4 |
+   | - | - | - | -  | - |
+   | A | 2 | C | -2 | 0 |
+
+   where 2 (at index 1) is the *positive* offset to end (start of frame), -2 (at index 3) the *negative* offset to next encoded 0.
+
+3) An empty frame | |, will be encoded as:
+
+   | 0 | 1 |
+   | - | - |
    | 1 | 0 |
 
 ### Frame Decoding
 
 Decoding starts from the end similar to rcobs.
 
-For 1), we read `4`, adds C, B, A, and reach the end (or start of frame). For 2) we read -2, add C, reach 2, and replace 2 by 0. At this point 2 indicates the offset to start of frame + 1, so we add A and reach the end (or start of the frame). For three it is trivial, we read 1 and reach the end, without adding any output.
+1) We read `4`, add `C`, `B`, `A` in reverse order and reach the end (or start of frame)
+
+2) We read `-2`, add `C`, reach `2`, and replace `2` by `0`. At this point `2` indicates the offset to end, so we add `A` and reach the start of the frame.
+
+3) We read `1` and reach the end without adding any output.
 
 ### Nested Frame Encoding
 
-1) Consider a frame | A | B |, preempted by a higher priority frame | a |:
+1) Consider a frame | A | B |, preempted by a higher priority frame | a |. Column `p` gives the frame priority, while 0, 1, 2 are points in time.
 
-   |    |   |   |
-   | -  | - | - |
-   |    | a |   |
-   |  A |   | B |
+   | p | 0 | 1 | 2 |
+   | - | - | - | - |
+   | 2 |   | a |   |
+   | 1 | A |   | B |
 
-   Is encoded as a sequence:
+   The frames are encoded by the sequence:
 
+   | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+   | - | - | - | - | - | - | - |  
    | A | a | 2 | 0 | B | 3 | 0 |
 
-2) A frame | 0 | 0 |, preempted by a higher priority frame | 0 |:
-   |    |   |   |
-   | -  | - | - |
-   |    | 0 |   |
-   |  0 |   | 0 |
+2) A frame | 0 | 0 |, preempted by a higher priority frame | 0 | at time 1:
 
-   Is encoded as a sequence:
+   | p | 0 | 1 | 2 |
+   | - | - | - | - |
+   | 2 |   | 0 |   |
+   | 1 | 0 |   | 0 |
 
+   The frames are encoded by the sequence:
+
+   | 0 | 1 | 2  | 3 | 4  | 5  | 6 |
+   | - | - | -  | - | -  | -  | - |  
    | 1 | 1 | -1 | 0 | -1 | -1 | 0 |
 
 ### Nested Frame Decoding
 
-As for previous example we start from the end.
+As for previous example we start decoding from the end. Here we focus on the outermost (lowest priority frame), inner (higher priority frames have at this point already been processed by an online implementation).
 
-For 1), we read 3 (the length + 1 of the low priority frame.), we add B. Now we run into higher priority frame (as denoted by the 0 delimiter). We skip the inner frame | a | 2 | 0 | (by decoding it and its potentially inner frames). We continue by reading and adding A and reach the end.
+1) We read `3` (the length + 1 of the low priority frame), we read and add `B` to output. Now we run into higher priority frame (as denoted by the 0 delimiter). We skip the inner frame | a | 2 | 0 | (by decoding it and its potentially inner frames while suppressing output). We continue by reading and adding `A` and reach the end.
 
-Similarly for 2) we read -1 (the offset to next 0 to replace), we add 0, read another -1. Now we run into higher priority frame (as denoted by the 0 delimiter). We skip the inner frame | 1 | -1 | 0 | (by decoding it and its potentially inner frames). We continue by reading 1 (which we replace by 0) and reach the end.
+2) We read `-1` (the offset to next 0 to replace), we add 0, read another `-1`. Now we run into higher priority frame (as denoted by the 0 delimiter). We skip the inner frame | 1 | -1 | 0 | (by decoding and skipping it and its potentially inner frames). We continue by reading `1` (which we replace by 0) and reach the end.
 
 ### Larger frames
 
@@ -118,4 +147,24 @@ Using COBS, the first byte read (from left) holds the offset to next 0 to replac
 
 In rcobs a similar approach can be taken where the last byte holds the offset. Landing the 0 marker of previous packet denotes the end, landing on 255 denotes chaining.
 
-TODO:
+Nested COBS is slightly more complex, here is an example on what might go wrong with an rcobs like encoding, using 127 (max positive byte) to indicate chaining: The example shows a problematic encoding of `d0-d126` followed by `A`.
+
+ | p | 0 | 1  | 2  | 3.. | 127 | 128 | 129 | 130 |
+ | - | - | -  | -  | -   | -   | -   | -   | -   |
+ | 2 |   | d0 | d1 | ... | 127 | A   | 2   | 0   |
+ | 1 | x |    |    |     |     |     |     |     |
+
+The problem here is that there is no way to tell if the read `2` indicates the end, or refers to the chain (127).
+
+We propose to solve this as follows:
+
+ | p | 0 | 1  | 2 | 3  | 4.. | 127  | 128 | 129 | 131 |
+ | - | - | -  | - | -  | -   | -    | -   | -   | -   |
+ | 2 |   | d0 | 2 | d1 | ... | d126 | A   | 127 | 0   |
+ | 1 | x |    |   |    |     |      |     |     |     |
+
+The `127` (at index 129) now refers to `2`, which in turn holds the end of frame offset. Even longer frames can be encoded, by chaining. Assume `127` was stored at index 2, our frame holds another 126 bytes, etc. so the approach generalize to arbitrary frame size.
+
+The crux here is that the encoder needs to know the size of the frame, to know where to inject the end of frame marker (the `2` at index 2 for the example), as there is no in place-method to back-patch the end-of frame marker in an online encoder.
+
+Notice, it is enough to know the frame size, we can still use an un-buffered encoder.The end of frame offset can be computed as size%126, while the number of chains is computed as size/126.
