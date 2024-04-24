@@ -39,13 +39,12 @@ fn main() -> Result<(), std::io::Error> {
                 for b in &buffer[0..n] {
                     print!("{:#03x} ", *b);
                     if let Some(frame_start) = de.decode(*b as i8) {
-                        let s: Vec<u8> = de.out_buf.iter().map(|i| *i as u8).collect();
-                        println!("---- str {:?}", std::str::from_utf8(&s));
+                        println!("---- bytes {:?}", de.out_buf);
                         if frame_start == -1 {
                             // clear both receive buffer and output buffer
                             // when outermost frame received
-                            de.clear_out();
                             de.clear_in();
+                            de.clear_out();
                         }
                     }
                 }
