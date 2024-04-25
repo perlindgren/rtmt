@@ -1,4 +1,4 @@
-use rtmt::short_frame_decode::NcDecode;
+use rtmt::decode::NcDecode;
 use rtmt::short_frame_encode::NcEncode;
 use std::option::Option;
 
@@ -10,7 +10,7 @@ fn valid(de_in: &[i8], de_expected: &[i8]) {
     }
 
     de.clear_out();
-    // let _ = de.decode(de_in[de_in.len() - 1]);
+
     assert_eq!(de.decode(de_in[de_in.len() - 1]), Option::Some(-1i32));
     assert_eq!(de.out_buf, de_expected);
     println!("frame {:?}", de.out_buf);

@@ -1,4 +1,4 @@
-//
+// decode
 
 use std::collections::VecDeque;
 
@@ -29,17 +29,31 @@ impl NcDecode {
 
     // scan frame recursively
     pub fn scan_frame(&mut self, mut p: i32, skip: bool) -> i32 {
-        let offset = self.in_buf[p as usize];
+        let mut offset = self.in_buf[p as usize];
         let mut is_next_end = offset.is_negative();
         let mut next: i32 = p - (offset as i32).abs();
         p -= 1;
 
         loop {
             if is_next_end && p == next {
-                return p;
+                println!("p {}, offset {}, next {}", p, offset, next);
+                if offset == -128 {
+                    offset = self.in_buf[p as usize];
+                    is_next_end = offset.is_negative();
+                    next += offset as i32;
+                    p -= 1;
+                    println!(
+                        "offset {}, is_next_end {}, next {}, p {}",
+                        offset, is_next_end, next, p
+                    );
+                    continue;
+                } else {
+                    return p;
+                }
             }
 
             let data = self.in_buf[p as usize];
+
             if data == 0 {
                 let new_p = self.scan_frame(p - 1, true);
                 next -= p - new_p;

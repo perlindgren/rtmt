@@ -1,4 +1,4 @@
-//
+// short_frame_encode
 
 #[derive(Debug)]
 struct State {
@@ -53,9 +53,6 @@ impl NcEncode {
 
             state.has_zero = true;
             vec![len]
-        } else if state.len == 127 {
-            state.len = 1;
-            vec![-128, data]
         } else {
             state.len += 1;
             vec![data]
