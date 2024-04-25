@@ -53,10 +53,10 @@ impl NcEncode {
 
             state.has_zero = true;
             vec![len]
+        } else if state.len == 127 {
+            state.len = 1;
+            vec![-128, data]
         } else {
-            // if state.len == 127 {
-            //     sate.len = 1;
-            // }
             state.len += 1;
             vec![data]
         }

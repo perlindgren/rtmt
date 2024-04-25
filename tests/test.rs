@@ -10,7 +10,7 @@ fn valid(de_in: &[i8], de_expected: &[i8]) {
     }
 
     de.clear_out();
-
+    // let _ = de.decode(de_in[de_in.len() - 1]);
     assert_eq!(de.decode(de_in[de_in.len() - 1]), Option::Some(-1i32));
     assert_eq!(de.out_buf, de_expected);
     println!("frame {:?}", de.out_buf);
@@ -198,7 +198,6 @@ fn encode_A0_0_a_preempt() {
     s.append(&mut en.frame_end());
 
     s.append(&mut en.frame_end());
-    println!("s {:?}", s);
 
     valid(&s, &[65]);
 }
@@ -235,9 +234,9 @@ fn encode_long() {
     let mut v = vec![];
     en.frame_begin();
 
-    for i in 0..100 {
-        s.append(&mut en.encode(65));
-        v.push(65);
+    for i in 1..128 {
+        s.append(&mut en.encode(i as i8));
+        v.push(i as i8);
     }
 
     s.append(&mut en.frame_end());
