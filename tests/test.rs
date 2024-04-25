@@ -21,7 +21,7 @@ fn frame(en: &mut NcEncode, data: &[i8]) -> Vec<i8> {
     en.frame_begin();
 
     for d in data {
-        v.push(en.encode(*d))
+        v.append(&mut en.encode(*d))
     }
 
     v.append(&mut en.frame_end());
@@ -70,13 +70,13 @@ fn encode_A_a_B_preempt() {
     let mut s = vec![];
 
     en.frame_begin();
-    s.push(en.encode(65));
+    s.append(&mut en.encode(65));
 
     en.frame_begin();
-    s.push(en.encode(97));
+    s.append(&mut en.encode(97));
     s.append(&mut en.frame_end());
 
-    s.push(en.encode(66));
+    s.append(&mut en.encode(66));
     s.append(&mut en.frame_end());
 
     valid(&s, &[65, 66]);
@@ -88,12 +88,12 @@ fn encode_A_B_preempt() {
     let mut en = NcEncode::new();
     let mut s = vec![];
     en.frame_begin();
-    s.push(en.encode(65));
+    s.append(&mut en.encode(65));
 
     en.frame_begin();
     s.append(&mut en.frame_end());
 
-    s.push(en.encode(66));
+    s.append(&mut en.encode(66));
     s.append(&mut en.frame_end());
 
     valid(&s, &[65, 66]);
@@ -105,13 +105,13 @@ fn encode_00_0_preempt() {
     let mut en = NcEncode::new();
     let mut s = vec![];
     en.frame_begin();
-    s.push(en.encode(0));
+    s.append(&mut en.encode(0));
 
     en.frame_begin();
-    s.push(en.encode(0));
+    s.append(&mut en.encode(0));
     s.append(&mut en.frame_end());
 
-    s.push(en.encode(0));
+    s.append(&mut en.encode(0));
     s.append(&mut en.frame_end());
 
     valid(&s, &[0, 0]);
@@ -123,7 +123,7 @@ fn encode_A__B_preempt() {
     let mut en = NcEncode::new();
     let mut s = vec![];
     en.frame_begin();
-    s.push(en.encode(65));
+    s.append(&mut en.encode(65));
 
     en.frame_begin();
 
@@ -132,7 +132,7 @@ fn encode_A__B_preempt() {
 
     s.append(&mut en.frame_end());
 
-    s.push(en.encode(66));
+    s.append(&mut en.encode(66));
     s.append(&mut en.frame_end());
 
     valid(&s, &[65, 66]);
@@ -144,13 +144,13 @@ fn encode_A_0_0_preempt() {
     let mut en = NcEncode::new();
     let mut s = vec![];
     en.frame_begin();
-    s.push(en.encode(65));
+    s.append(&mut en.encode(65));
 
     en.frame_begin();
-    s.push(en.encode(0));
+    s.append(&mut en.encode(0));
     s.append(&mut en.frame_end());
 
-    s.push(en.encode(0));
+    s.append(&mut en.encode(0));
     s.append(&mut en.frame_end());
 
     valid(&s, &[65, 0]);
@@ -159,23 +159,23 @@ fn encode_A_0_0_preempt() {
 #[test]
 #[allow(non_snake_case)]
 fn encode_A00_0_0_preempt() {
-    let mut nc = NcEncode::new();
+    let mut en = NcEncode::new();
     let mut s = vec![];
-    nc.frame_begin();
-    s.push(nc.encode(65));
+    en.frame_begin();
+    s.append(&mut en.encode(65));
 
-    nc.frame_begin();
-    s.push(nc.encode(0));
-    s.append(&mut nc.frame_end());
+    en.frame_begin();
+    s.append(&mut en.encode(0));
+    s.append(&mut en.frame_end());
 
-    s.push(nc.encode(0));
+    s.append(&mut en.encode(0));
 
-    nc.frame_begin();
-    s.push(nc.encode(0));
-    s.append(&mut nc.frame_end());
+    en.frame_begin();
+    s.append(&mut en.encode(0));
+    s.append(&mut en.frame_end());
 
-    s.push(nc.encode(0));
-    s.append(&mut nc.frame_end());
+    s.append(&mut en.encode(0));
+    s.append(&mut en.frame_end());
 
     valid(&s, &[65, 0, 0]);
 }
@@ -183,21 +183,21 @@ fn encode_A00_0_0_preempt() {
 #[test]
 #[allow(non_snake_case)]
 fn encode_A0_0_a_preempt() {
-    let mut nc = NcEncode::new();
+    let mut en = NcEncode::new();
     let mut s = vec![];
-    nc.frame_begin();
-    s.push(nc.encode(65));
+    en.frame_begin();
+    s.append(&mut en.encode(65));
 
-    nc.frame_begin();
-    s.push(nc.encode(0));
+    en.frame_begin();
+    s.append(&mut en.encode(0));
 
-    nc.frame_begin();
-    s.push(nc.encode(97));
-    s.append(&mut nc.frame_end());
+    en.frame_begin();
+    s.append(&mut en.encode(97));
+    s.append(&mut en.frame_end());
 
-    s.append(&mut nc.frame_end());
+    s.append(&mut en.frame_end());
 
-    s.append(&mut nc.frame_end());
+    s.append(&mut en.frame_end());
     println!("s {:?}", s);
 
     valid(&s, &[65]);
@@ -206,23 +206,41 @@ fn encode_A0_0_a_preempt() {
 #[test]
 #[allow(non_snake_case)]
 fn encode_AD_B_C_preempt() {
-    let mut nc = NcEncode::new();
+    let mut en = NcEncode::new();
     let mut s = vec![];
-    nc.frame_begin();
-    s.push(nc.encode(65));
+    en.frame_begin();
+    s.append(&mut en.encode(65));
 
-    nc.frame_begin();
-    s.push(nc.encode(66));
+    en.frame_begin();
+    s.append(&mut en.encode(66));
 
-    nc.frame_begin();
-    s.push(nc.encode(67));
-    s.append(&mut nc.frame_end());
+    en.frame_begin();
+    s.append(&mut en.encode(67));
+    s.append(&mut en.frame_end());
 
-    s.append(&mut nc.frame_end());
+    s.append(&mut en.frame_end());
 
-    s.push(nc.encode(68));
+    s.append(&mut en.encode(68));
 
-    s.append(&mut nc.frame_end());
+    s.append(&mut en.frame_end());
 
     valid(&s, &[65, 68])
+}
+
+#[test]
+#[allow(non_snake_case)]
+fn encode_long() {
+    let mut en = NcEncode::new();
+    let mut s = vec![];
+    let mut v = vec![];
+    en.frame_begin();
+
+    for i in 0..100 {
+        s.append(&mut en.encode(65));
+        v.push(65);
+    }
+
+    s.append(&mut en.frame_end());
+
+    valid(&s, &v)
 }

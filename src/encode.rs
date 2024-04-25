@@ -31,31 +31,34 @@ impl NcEncode {
         vec![
             if inner_state.has_zero {
                 // length to next zero
-                -inner_state.len
+                inner_state.len
             } else {
                 // length to prev package
-                inner_state.len + 1
+                -(inner_state.len + 1)
             },
             0,
         ]
     }
 
     /// encode a (signed) byte
-    pub fn encode(&mut self, data: i8) -> i8 {
+    pub fn encode(&mut self, data: i8) -> Vec<i8> {
         let state = self.states.last_mut().unwrap();
         if data == 0 {
             let len = if state.has_zero {
-                -state.len
+                state.len
             } else {
-                state.len + 1
+                -(state.len + 1)
             };
             state.len = 1;
 
             state.has_zero = true;
-            len
+            vec![len]
         } else {
+            // if state.len == 127 {
+            //     sate.len = 1;
+            // }
             state.len += 1;
-            data
+            vec![data]
         }
     }
 }
