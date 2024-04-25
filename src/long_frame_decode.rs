@@ -31,7 +31,7 @@ impl NcDecode {
     pub fn scan_frame(&mut self, mut p: i32, skip: bool) -> i32 {
         let offset = self.in_buf[p as usize];
         let mut is_next_end = offset.is_negative();
-        let mut next: i32 = p - offset.abs() as i32;
+        let mut next: i32 = p - (offset as i32).abs();
         p -= 1;
 
         loop {
@@ -51,7 +51,7 @@ impl NcDecode {
                         self.out_buf.push_front(0);
                     }
                     is_next_end = data.is_negative();
-                    next -= data.abs() as i32;
+                    next -= (data as i32).abs();
                 } else if !skip {
                     self.out_buf.push_front(data);
                 }

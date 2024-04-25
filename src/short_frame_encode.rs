@@ -34,7 +34,7 @@ impl NcEncode {
                 inner_state.len
             } else {
                 // length to prev package
-                -(inner_state.len + 1)
+                (-inner_state.len) - 1
             },
             0,
         ]

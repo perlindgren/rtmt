@@ -1,4 +1,4 @@
-use rtmt::decode::NcDecode;
+use rtmt::short_frame_decode::NcDecode;
 use serial2::SerialPort;
 use std::time::Duration;
 // On Windows, use something like "COM1".
