@@ -1,0 +1,140 @@
+module NestedCobs
+
+  use int.Int
+  use list.ListRich
+
+  let rec function next_decode (l: list int) (n: int): list int
+    = 
+    match l with
+    | Nil -> Nil
+    | Cons e ll -> 
+      if e = 0 then
+        Nil
+      else begin
+        if n = 1 then
+          (* replace zero *)
+          Cons 0 (next_decode ll e)
+        else
+          Cons e (next_decode ll (n - 1))
+      end     
+    end
+    
+    with next_0 (l: list int) : (int, list int)
+    ensures {
+      let (n, ln) = result in
+      next_decode ln n = l
+    }
+    = 
+    match l with
+    | Nil -> (1, Cons 0 Nil)
+    | Cons e ll -> 
+      let (n, ln) = next_0 ll in
+
+      if e = 0 then
+        (1, Cons n ln)
+      else 
+        (1 + n, Cons e ln)
+    end
+    
+    
+    
+    
+  let function encode (l: list int) : list int
+    ensures { result.length > 0 }
+  = let (n, ll) = next_0 l in
+    Cons n ll
+
+  
+  
+  let rec function decode (l: list int) : list int
+    requires { l.length >  0}
+    variant { l }
+  = match l with
+    | Nil -> absurd
+    | Cons n ll -> next_decode ll n
+    end 
+    
+  lemma en_de:
+    forall l:list int. 
+      decode(encode l) = l
+  
+  (*
+  let rec next_0 (l: list int) : (int, list int)
+    variant { l }
+    ensures { result = fn_next_0 l }
+    ensures { 
+    let (_n, ll) = result in 
+      ll.length > 0
+    
+      (* l = Nil -> n = 1 /\
+      mem 0 l -> n < l.length /\
+      not (mem 0 l) -> ll = l *)
+    }
+    ensures {
+      let (n, ll) = result in 
+      fn_decode (Cons n ll) = l   
+    }
+    = 
+    match l with
+    | Nil -> (1, Cons 0 Nil)
+    | Cons e ll -> 
+      let (n, ln) = next_0 ll in
+
+      if e = 0 then
+        (1, Cons n ln)
+      else 
+        (1 + n, Cons e ln)
+    end
+  
+  let encode (l: list int) : list int
+    ensures { result.length > 0 }
+    ensures { result = fn_encode l }
+  = let (n, ll) = next_0 l in
+    Cons n ll
+
+  let rec next_decode (l: list int) (n: int): list int
+    variant { l } 
+    ensures { result = fn_next_decode l n }
+    = 
+    match l with
+    | Nil -> Nil
+    | Cons e ll -> 
+      if e = 0 then
+        Nil
+      else begin
+        if n = 1 then
+          (* replace zero *)
+          Cons 0 (next_decode ll e)
+        else
+          Cons e (next_decode ll (n - 1))
+      end     
+    end
+  
+  let decode (l: list int) : list int
+    requires { l.length > 0 }
+    ensures { result = fn_decode l } 
+  = match l with
+    | Nil -> absurd
+    | Cons n ll -> next_decode ll n
+    end 
+
+
+  let en_de (l: list int) : bool
+    ensures { result = true }
+  = let e : list int = encode l in
+    let d : list int = decode e in
+    d.length = l.length
+
+  lemma en_de_length :
+    forall l : list int. 
+      let e = fn_encode l in
+      let d = fn_decode e in
+      d.length = l.length
+      
+  goal en_de_eq :
+    forall l : list int. 
+      let e = fn_encode l in
+      let d = fn_decode e in
+      d = l
+  *)
+end

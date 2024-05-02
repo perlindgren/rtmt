@@ -1,0 +1,5 @@
+{
+    "ocaml.server.extendedHover": true,
+    "ocaml.server.syntaxDocumentation": true,
+    "editor.defaultFormatter": "ocamllabs.ocaml-platform"
+}

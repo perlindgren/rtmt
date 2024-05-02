@@ -1,0 +1,5 @@
+(executable
+ (public_name test_dune)
+ (name main)
+ (modules main n_cobs)
+ (libraries test_dune zarith))
