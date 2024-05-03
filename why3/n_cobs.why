@@ -62,8 +62,15 @@ module NestedCobs
         Nil
     | Cons e ll -> 
         match n = 1 with
-        | True -> Cons 0 (rec_decode e ll r)
-        | False -> Cons e (rec_decode (n - 1) ll r)
+        | True -> 
+          let res = Cons 0 (rec_decode e ll r) in
+          assert { cobs res (n, l) };
+          res
+          
+        | False -> 
+          let res = Cons e (rec_decode (n - 1) ll r) in
+          assert { cobs res (n, l) };
+          res
         end
     end
     
