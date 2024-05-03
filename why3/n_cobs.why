@@ -35,8 +35,69 @@ module NestedCobs
         (1 + n, Cons e ln)  
     end
     
-   
+  let encode (l: list int) : list int
+    ensures { result.length > 0 }
+    ensures { 
+      match result with
+      | Nil -> true
+      | Cons n ln -> cobs l (n, ln) 
+      end
+    }
+  = let (n, ll) = rec_encode l in
+    Cons n ll  
+
+  let rec function rec_decode (n: int) (l: list int) (ghost r: list int): list int
+    requires { cobs r (n, l) }
+    variant { l }
+    ensures { 
+      match result with 
+      | Nil -> true (* cannot happen *)
+      | lr -> cobs result (n, l) 
+      end
+    }
+  = match l with
+    | Nil -> Nil
+    | Cons e Nil ->
+      assert { e = 0 };
+      Nil
+      
+    | Cons e ll -> 
+      assert { n > 0 };
+      assert { e <> 0 };
+      
+      match n = 1 with
+      | True -> (* replace zero *)
+        match r with
+        | Nil -> absurd
+        | Cons re rl -> 
+        assert { e = re };
+        let r = Cons 0 (rec_decode e ll rl) in
+        r  
+        end
+      | False -> 
+        match r with
+        | Nil -> absurd
+        | Cons _re rl ->
+          let r = Cons e (rec_decode (n - 1) ll rl) in
+          r
+        end
+      end     
+    end
     
+  let decode (l: list int) (ghost r: list int): list int
+    requires { l.length > 0 }
+    requires { 
+      match l with 
+      | Nil -> false (* absurd *) 
+      | Cons cn cl -> cobs r (cn, cl)
+      end
+    }
+    (* ensures { result = fn_decode l } *)
+  = match l with
+    | Nil -> absurd
+    | Cons cn cl -> rec_decode cn cl r  
+    end 
+
   (*
   
   lemma cobs_rec_valid: forall pl nc lc. cobs pl (nc, lc) -> 
