@@ -3,24 +3,14 @@ module NestedCobs
   use int.Int
   use list.ListRich
 
-  (* cobs <original> <cobs coded> *)
-  inductive cobs (list int) (int, list int) =
+  (* specification *)
+  inductive cobs (plain: list int) (encoded: (int, list int))=
   | EncodeEnd: cobs Nil (1, Cons 0 Nil) 
-  | EncodeZero: forall pl cl: list int, cn:int. cn > 0 -> cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl)
- (*| DecodeZero: forall pl cl: list int, cn:int. cn > 0 -> pl <> Nil -> cobs (Cons 0 pl) (1, Cons cn cl) -> cobs pl (cn, cl) *)
-  | EncodeNonZero: forall l ln: list int, n e:int. n > 0 -> cobs l (n, ln) -> cobs (Cons e l) (1 + n, Cons e ln) 
- (* | NotZero_: forall l ln: list int, n e:int. n > 0 -> cobs (Cons e l) (1 + n, Cons e ln) -> cobs l (n, ln) *)
+  | EncodeZero: forall pl cl: list int, cn:int. cn > 0 -> cn <= 255 -> cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl)
+  | EncodeNonZero: forall l ln: list int, cn e:int. cn > 0 -> cn <= 255 -> cobs l (cn, ln) -> cobs (Cons e l) (1 + cn, Cons e ln) 
+  (*| EncodeGroug: forall l ln: list int, cn e:int. cn = 255 -> cobs l (cn, ln) -> cobs (Cons e l) (1, Cons 255 (Cons e ln)) *)
   
-  lemma cobs_end: forall cl. cobs Nil cl -> cl = (1, Cons 0 Nil) 
-  lemma cobs_end_nil: forall pl. cobs pl (1, Cons 0 Nil) -> pl = Nil 
-  lemma cobs_n_pos: forall pl cn cl. cobs pl (cn, cl) -> cn > 0
-  lemma cobs_valid_not_nil: forall pl cn cl. cobs pl (cn, cl) -> cl <> Nil
-  lemma cobs_encode_zero: forall pl cn cl. cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl) 
-  lemma cobs_encode_non_zero: forall pnz pl cn cl. cobs pl (cn, cl) -> cobs (Cons pnz pl) (1 + cn, Cons pnz cl) 
-  
-  predicate is_cobs (n:int) (l: list int) (res: list int) = 
-    forall r. cobs r (n, l) -> r = res
-  
+  (* recursive encoding function *)
   let rec function rec_encode (l: list int) : (int, list int)
     ensures { cobs l result }
     = 
@@ -29,24 +19,46 @@ module NestedCobs
     | Cons e ll -> 
       let (n, ln) = rec_encode ll in
       assert { n > 0 };
-      if e = 0 then 
+      (* assert { n <= 255 }; *)
+      if n = 255 then
+        (2, Cons e (Cons 255 ln))
+      else if e = 0 then 
         (1, Cons n ln) 
-      else 
+      else
         (1 + n, Cons e ln)  
     end
-    
+  
+  (* recursive decoding function *)  
   let rec function rec_decode (cn: int) (cl: list int) : list int
+      variant  { cl }
     = match cl with
     | Nil -> Nil
-    | Cons e Nil -> Nil
-    | Cons e ll ->   
-        match cn = 1 with
-        | True -> Cons 0 (rec_decode e  ll) 
-        | False -> Cons e (rec_decode (cn - 1) ll) 
-        end
+    | Cons _ Nil -> Nil
+    | Cons e ll -> 
+        if cn = 255 then
+          rec_decode 2 ll
+        else if cn = 1 then
+          Cons 0 (rec_decode e ll) 
+        else
+          Cons e (rec_decode (cn - 1) ll) 
     end
   
-  goal g: forall l  [@induction] : list int. 
+  goal proof_reversible: forall l [@induction] : list int. 
     let (nc, nl) = rec_encode l in 
-      rec_decode nc nl = l 
+    rec_decode nc nl = l 
+    
+  (* extractable interface *)
+  let function encode (l: list int) : list int
+  = let (cn, cl) = rec_encode l in
+    Cons cn cl
+    
+  let function decode (l: list int) : list int
+  = match l with
+    | Nil -> Nil 
+    | Cons cn cl -> rec_decode cn cl
+    end
+    
+  goal proof_reversible_interface: 
+    forall l [@induction] : list int. 
+    decode (encode l) = l 
 end
