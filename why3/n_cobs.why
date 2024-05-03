@@ -52,36 +52,19 @@ module NestedCobs
     ensures { 
       match result with 
       | Nil -> true (* cannot happen *)
-      | lr -> cobs result (n, l) 
+      | _lr -> cobs result (n, l) 
       end
     }
   = match l with
-    | Nil -> Nil
-    | Cons e Nil ->
-      assert { e = 0 };
-      Nil
-      
+    | Nil -> absurd
+    | Cons _e Nil -> 
+        assert { _e = 0 };
+        Nil
     | Cons e ll -> 
-      assert { n > 0 };
-      assert { e <> 0 };
-      
-      match n = 1 with
-      | True -> (* replace zero *)
-        match r with
-        | Nil -> absurd
-        | Cons re rl -> 
-        assert { e = re };
-        let r = Cons 0 (rec_decode e ll rl) in
-        r  
+        match n = 1 with
+        | True -> Cons 0 (rec_decode e ll r)
+        | False -> Cons e (rec_decode (n - 1) ll r)
         end
-      | False -> 
-        match r with
-        | Nil -> absurd
-        | Cons _re rl ->
-          let r = Cons e (rec_decode (n - 1) ll rl) in
-          r
-        end
-      end     
     end
     
   let decode (l: list int) (ghost r: list int): list int

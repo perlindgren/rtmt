@@ -6,24 +6,24 @@
 <prover id="3" name="Alt-Ergo" version="2.5.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="2.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC5" version="1.0.1-dev.2.77d0bec48" alternative="strings" timelimit="5" steplimit="0" memlimit="1000"/>
-<file format="whyml" proved="true">
+<file format="whyml">
 <path name=".."/><path name="n_cobs.why"/>
 <theory name="NestedCobs">
- <goal name="cobs_end">
- <transf name="induction_pr" >
-  <goal name="cobs_end.0">
+ <goal name="cobs_end" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="cobs_end.0" proved="true">
   <proof prover="2"><result status="valid" time="0.014994" steps="4290"/></proof>
   <proof prover="3" obsolete="true"><result status="valid" time="0.004312" steps="1"/></proof>
   <proof prover="4" obsolete="true"><result status="valid" time="0.007600"/></proof>
   <proof prover="6" obsolete="true"><result status="valid" time="0.010972" steps="4290"/></proof>
   </goal>
-  <goal name="cobs_end.1">
+  <goal name="cobs_end.1" proved="true">
   <proof prover="2"><result status="valid" time="0.014956" steps="8272"/></proof>
   <proof prover="3" obsolete="true"><result status="valid" time="0.003614" steps="26"/></proof>
   <proof prover="4" obsolete="true"><result status="valid" time="0.008541"/></proof>
   <proof prover="6" obsolete="true"><result status="valid" time="0.013174" steps="8291"/></proof>
   </goal>
-  <goal name="cobs_end.2">
+  <goal name="cobs_end.2" proved="true">
   <proof prover="2"><result status="valid" time="0.021364" steps="8278"/></proof>
   <proof prover="3" obsolete="true"><result status="timeout" time="5.000000" steps="122769"/></proof>
   <proof prover="4" obsolete="true"><undone/></proof>
@@ -31,34 +31,43 @@
   </goal>
  </transf>
  </goal>
- <goal name="cobs_end_nil">
- <transf name="induction_pr" >
-  <goal name="cobs_end_nil.0">
+ <goal name="cobs_end_nil" proved="true">
+ <transf name="induction_pr" proved="true" >
+  <goal name="cobs_end_nil.0" proved="true">
   <proof prover="2"><result status="valid" time="0.011103" steps="5357"/></proof>
   </goal>
-  <goal name="cobs_end_nil.1">
+  <goal name="cobs_end_nil.1" proved="true">
   <proof prover="2"><result status="valid" time="0.022592" steps="8816"/></proof>
   </goal>
-  <goal name="cobs_end_nil.2">
+  <goal name="cobs_end_nil.2" proved="true">
   <proof prover="2"><result status="valid" time="0.015696" steps="8867"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="cobs_n_pos">
+ <goal name="cobs_n_pos" proved="true">
  <proof prover="2"><result status="valid" time="0.021251" steps="6881"/></proof>
  </goal>
- <goal name="cobs_valid_not_nil">
+ <goal name="cobs_valid_not_nil" proved="true">
  <proof prover="2"><result status="valid" time="0.019288" steps="9762"/></proof>
  </goal>
- <goal name="cobs_encode_zero">
+ <goal name="cobs_encode_zero" proved="true">
  <proof prover="2"><result status="valid" time="0.023249" steps="10047"/></proof>
  </goal>
- <goal name="cobs_encode_non_zero">
+ <goal name="cobs_encode_non_zero" proved="true">
  <proof prover="2"><result status="valid" time="0.025269" steps="10587"/></proof>
  <proof prover="3" obsolete="true"><result status="timeout" time="5.000000" steps="124362"/></proof>
  </goal>
- <goal name="rec_encode&#39;vc" expl="VC for rec_encode">
+ <goal name="rec_encode&#39;vc" expl="VC for rec_encode" proved="true">
  <proof prover="2"><result status="valid" time="0.026627" steps="11491"/></proof>
+ </goal>
+ <goal name="encode&#39;vc" expl="VC for encode" proved="true">
+ <proof prover="2"><result status="valid" time="0.028284" steps="11699"/></proof>
+ </goal>
+ <goal name="rec_decode&#39;vc" expl="VC for rec_decode">
+ <proof prover="2" obsolete="true"><result status="timeout" time="5.000000" steps="2006007"/></proof>
+ </goal>
+ <goal name="decode&#39;vc" expl="VC for decode" proved="true">
+ <proof prover="2"><result status="valid" time="0.018160" steps="9506"/></proof>
  </goal>
 </theory>
 </file>

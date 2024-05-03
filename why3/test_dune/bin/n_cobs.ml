@@ -10,12 +10,12 @@ let encode (l: (Z.t) list) : (Z.t) list =
 
 let rec rec_decode (n2: Z.t) (l: (Z.t) list) : (Z.t) list =
   match l with
-  | [] -> [] 
-  | e :: ([]) -> [] 
+  | [] -> assert false (* absurd *)
+  | _e :: ([]) -> [] 
   | e :: ll1 ->
     begin match Z.equal n2 Z.one with
-    | true -> assert false (* absurd *)
-    | false -> assert false (* absurd *)
+    | true -> Z.zero :: rec_decode e ll1
+    | false -> e :: rec_decode (Z.sub n2 Z.one) ll1
     end
 
 let decode (l: (Z.t) list) : (Z.t) list =

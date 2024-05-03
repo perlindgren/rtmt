@@ -2,9 +2,11 @@ open N_cobs
 open Printf
 
 let () =
-  let input = [] in
-
-  (* let l = [ 0 ] in *)
+  (*let input = [] in *)
+  let input = [ 0 ] in
+  (* let input = [ 41; 0 ] in *)
+  (* let input = [ 0; 41 ] in *)
+  (* let input = [ 41; 0; 42 ] in *)
   print_string "Input ";
   List.iter (printf "%d ") input;
 
