@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.0.1-dev.2.77d0bec48" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name="cobs.why"/>
+<theory name="NestedCobs">
+ <goal name="cobs_end" proved="true">
+ <proof prover="0"><result status="valid" time="0.020289" steps="9497"/></proof>
+ </goal>
+ <goal name="cobs_end_nil" proved="true">
+ <proof prover="0"><result status="valid" time="0.024154" steps="9840"/></proof>
+ </goal>
+ <goal name="cobs_n_pos" proved="true">
+ <proof prover="0"><result status="valid" time="0.014470" steps="6881"/></proof>
+ </goal>
+ <goal name="cobs_valid_not_nil" proved="true">
+ <proof prover="0"><result status="valid" time="0.020383" steps="9762"/></proof>
+ </goal>
+ <goal name="cobs_encode_zero" proved="true">
+ <proof prover="0"><result status="valid" time="0.020522" steps="10047"/></proof>
+ </goal>
+ <goal name="cobs_encode_non_zero" proved="true">
+ <proof prover="0"><result status="valid" time="0.023894" steps="10587"/></proof>
+ </goal>
+ <goal name="rec_encode&#39;vc" expl="VC for rec_encode" proved="true">
+ <proof prover="0"><result status="valid" time="0.028323" steps="11435"/></proof>
+ </goal>
+ <goal name="g">
+ <transf name="compute_in_goal" >
+  <goal name="g.0">
+  <transf name="induction_ty_lex" >
+   <goal name="g.0.0">
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
