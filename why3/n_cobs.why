@@ -49,12 +49,7 @@ module NestedCobs
   let rec function rec_decode (n: int) (l: list int) (ghost r: list int): list int
     requires { cobs r (n, l) }
     variant { l }
-    ensures { 
-      match result with 
-      | Nil -> true (* cannot happen *)
-      | _lr -> cobs result (n, l) 
-      end
-    }
+    ensures { cobs result (n, l) }
   = match l with
     | Nil -> absurd
     | Cons _e Nil -> 
@@ -63,14 +58,22 @@ module NestedCobs
     | Cons e ll -> 
         match n = 1 with
         | True -> 
-          let res = Cons 0 (rec_decode e ll r) in
-          assert { cobs res (n, l) };
-          res
-          
-        | False -> 
-          let res = Cons e (rec_decode (n - 1) ll r) in
-          assert { cobs res (n, l) };
-          res
+          match r with 
+          | Nil -> absurd
+          | Cons ph pt ->
+            let res = Cons 0 (rec_decode e ll pt) in
+            assert { cobs res (n, ll) };
+            res
+          end
+  
+        | False ->
+          match r with 
+          | Nil -> absurd
+          | Cons ph pt ->
+            let res = Cons e (rec_decode (n - 1) ll pt) in
+            assert { cobs res (n, ll) };
+            res
+          end 
         end
     end
     
