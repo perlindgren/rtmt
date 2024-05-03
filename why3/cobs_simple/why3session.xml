@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.0.1-dev.2.77d0bec48" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="cobs_simple.why"/>
+<theory name="NestedCobs" proved="true">
+ <goal name="rec_encode&#39;vc" expl="VC for rec_encode" proved="true">
+ <proof prover="0"><result status="valid" time="0.035661" steps="16877"/></proof>
+ </goal>
+ <goal name="proof_reversible" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="proof_reversible.0" proved="true">
+  <proof prover="0"><result status="valid" time="0.049941" steps="24703"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="encode&#39;vc" expl="VC for encode" proved="true">
+ <proof prover="0"><result status="valid" time="0.007021" steps="5611"/></proof>
+ </goal>
+ <goal name="proof_reversible_interface" proved="true">
+ <transf name="compute_in_goal" proved="true" >
+  <goal name="proof_reversible_interface.0" proved="true">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.000000" steps="1721658"/></proof>
+  <transf name="induction_ty_lex" proved="true" >
+   <goal name="proof_reversible_interface.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.062263" steps="32473"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

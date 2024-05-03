@@ -1,0 +1,57 @@
+module NestedCobs
+
+  use int.Int
+  use list.ListRich
+
+  (* specification *)
+  inductive cobs (plain: list int) (encoded: (int, list int))=
+  | End: cobs Nil (1, Cons 0 Nil) 
+  | Zero: forall pl cl: list int, cn:int. cn > 0 -> cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl)
+  | NonZero: forall l ln: list int, cn e:int. cn > 0 -> cobs l (cn, ln) -> cobs (Cons e l) (1 + cn, Cons e ln) 
+  
+  (* recursive encoding function *)
+  let rec function rec_encode (l: list int) : (int, list int)
+    ensures { cobs l result }
+    = 
+    match l with
+    | Nil -> (1, Cons 0 Nil) 
+    | Cons e ll -> 
+      let (n, ln) = rec_encode ll in
+      assert { n > 0 };
+      if e = 0 then 
+        (1, Cons n ln) 
+      else 
+        (1 + n, Cons e ln)  
+    end
+  
+  (* recursive decoding function *)  
+  let rec function rec_decode (cn: int) (cl: list int) : list int
+    = match cl with
+    | Nil -> Nil
+    | Cons _ Nil -> Nil
+    | Cons e ll ->   
+        if cn = 1 then
+          Cons 0 (rec_decode e  ll) 
+        else
+          Cons e (rec_decode (cn - 1) ll) 
+    end
+  
+  goal proof_reversible: forall l [@induction] : list int. 
+    let (nc, nl) = rec_encode l in 
+    rec_decode nc nl = l 
+    
+  (* extractable interface *)
+  let function encode (l: list int) : list int
+  = let (cn, cl) = rec_encode l in
+    Cons cn cl
+    
+  let function decode (l: list int) : list int
+  = match l with
+    | Nil -> Nil 
+    | Cons cn cl -> rec_decode cn cl
+    end
+    
+  goal proof_reversible_interface: 
+    forall l [@induction] : list int. 
+      decode (encode l) = l 
+end
