@@ -3,6 +3,144 @@ module NestedCobs
   use int.Int
   use list.ListRich
 
+  (* cobs <original> <cobs coded> *)
+  inductive cobs (list int) (int, list int) =
+  | EncodeEnd: cobs Nil (1, Cons 0 Nil) 
+  | EncodeZero: forall pl cl: list int, cn:int. cn > 0 -> cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl)
+ (*| DecodeZero: forall pl cl: list int, cn:int. cn > 0 -> pl <> Nil -> cobs (Cons 0 pl) (1, Cons cn cl) -> cobs pl (cn, cl) *)
+  | EncodeNonZero: forall l ln: list int, n e:int. n > 0 -> cobs l (n, ln) -> cobs (Cons e l) (1 + n, Cons e ln) 
+ (* | NotZero_: forall l ln: list int, n e:int. n > 0 -> cobs (Cons e l) (1 + n, Cons e ln) -> cobs l (n, ln) *)
+  
+  lemma cobs_end: forall cl. cobs Nil cl -> cl = (1, Cons 0 Nil) 
+  lemma cobs_end_nil: forall pl. cobs pl (1, Cons 0 Nil) -> pl = Nil 
+  lemma cobs_n_pos: forall pl cn cl. cobs pl (cn, cl) -> cn > 0
+  lemma cobs_valid_not_nil: forall pl cn cl. cobs pl (cn, cl) -> cl <> Nil
+  lemma cobs_encode_zero: forall pl cn cl. cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl) 
+  lemma cobs_encode_non_zero: forall pnz pl cn cl. cobs pl (cn, cl) -> cobs (Cons pnz pl) (1 + cn, Cons pnz cl) 
+  
+  predicate is_cobs (n:int) (l: list int) (res: list int) = 
+    forall r. cobs r (n, l) -> r = res
+  
+  let rec function rec_encode (l: list int) : (int, list int)
+    variant { l }
+    ensures { cobs l result }
+    = 
+    match l with
+    | Nil -> (1, Cons 0 Nil) 
+    | Cons e ll -> 
+      let (n, ln) = rec_encode ll in
+      if e = 0 then 
+        (1, Cons n ln) 
+      else 
+        (1 + n, Cons e ln)  
+    end
+    
+   
+    
+  (*
+  
+  lemma cobs_rec_valid: forall pl nc lc. cobs pl (nc, lc) -> 
+    match pl with
+    | Nil -> (nc, lc) = (1, Cons 0 Nil)
+    | Cons plh plt ->  
+      match lc with
+      | Nil -> false (* absurd *)
+      | Cons lch _ -> if plh = 0 then (lch = 1) else true
+      end
+    end
+    
+    *)
+    (*
+      match re = 0 with 
+      | True -> 
+        n = 1
+        (*
+        match l with 
+        | Nil -> false (*absurd*)
+        | Cons le ll -> cobs rl (re, ll)
+        
+        end
+        *)
+      | _    -> true
+      end
+      
+    end
+    *)
+    (*
+  (*
+    match l with
+    | Nil -> true
+    | Cons ln ll -> ln > 0
+    end
+     *)
+  
+  predicate is_cobs (n:int) (l: list int) (res: list int) = 
+    forall r. cobs r (n, l) -> r = res
+  
+  let rec function rec_encode (l: list int) : (int, list int)
+    variant { l }
+    ensures { cobs l result }
+    = 
+    match l with
+    | Nil -> (1, Cons 0 Nil) 
+    | Cons e ll -> 
+      let (n, ln) = rec_encode ll in
+      if e = 0 then 
+        (1, Cons n ln) 
+      else 
+        (1 + n, Cons e ln)  
+    end
+    
+  let encode (l: list int) : list int
+    ensures { result.length > 0 }
+    ensures { 
+      match result with
+      | Nil -> true
+      | Cons n ln -> cobs l (n, ln) 
+      end
+    }
+  = let (n, ll) = rec_encode l in
+    Cons n ll  
+
+  let rec function decode (n: int) (l: list int) (ghost r: list int): list int
+    requires { cobs r (n, l) }
+    variant { l }
+    ensures { 
+      match result with 
+      | Nil -> true (* cannot happen *)
+      | lr -> cobs result (n, l) 
+      end
+    }
+  = match l with
+    | Nil -> Nil
+    | Cons e Nil ->
+      assert { e = 0 };
+      Nil
+      
+    | Cons e ll -> 
+      assert { n > 0 };
+      assert { e <> 0 };
+      
+      match n = 1 with
+      | True -> (* replace zero *)
+        match r with
+        | Nil -> absurd
+        | Cons re rl -> 
+        assert { e = re };
+        let r = Cons 0 (decode e ll rl) in
+        r  
+        end
+      | False -> 
+        match r with
+        | Nil -> absurd
+        | Cons re rl ->
+          let r = Cons e (decode (n - 1) ll rl) in
+          r
+        end
+      end     
+    end
+  
+(*  
   let rec function next_decode (n: int) (l: list int): list int
     requires { n > 0 }
     variant { l }
@@ -153,4 +291,7 @@ module NestedCobs
       let d = fn_decode e in
       d = l
   *)
+  *)
+  *)
+ 
 end
