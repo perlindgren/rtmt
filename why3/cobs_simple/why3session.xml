@@ -2,30 +2,97 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC5" version="1.0.1-dev.2.77d0bec48" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.1.2" alternative="strings+counterexamples" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.5.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="cobs_simple.why"/>
-<theory name="NestedCobs" proved="true">
- <goal name="rec_encode&#39;vc" expl="VC for rec_encode" proved="true">
- <proof prover="0"><result status="valid" time="0.035661" steps="16877"/></proof>
- </goal>
- <goal name="proof_reversible" proved="true">
- <transf name="induction_ty_lex" proved="true" >
-  <goal name="proof_reversible.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.049941" steps="24703"/></proof>
+<theory name="NestedCobs">
+ <goal name="unique">
+ <transf name="induction_ty_lex" >
+  <goal name="unique.0">
+  <transf name="split_vc" >
+   <goal name="unique.0.0">
+   <proof prover="0"><result status="valid" time="0.050728" steps="9822"/></proof>
+   </goal>
+   <goal name="unique.0.1">
+   <proof prover="2" timelimit="1"><result status="valid" time="0.136168" steps="924"/></proof>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
- <goal name="encode&#39;vc" expl="VC for encode" proved="true">
- <proof prover="0"><result status="valid" time="0.007021" steps="5611"/></proof>
+ <goal name="rec_encode&#39;vc" expl="VC for rec_encode">
+ <proof prover="0"><result status="valid" time="2.532385" steps="268487"/></proof>
+ <proof prover="1"><result status="valid" time="1.281576" steps="85099"/></proof>
  </goal>
- <goal name="proof_reversible_interface" proved="true">
- <transf name="compute_in_goal" proved="true" >
-  <goal name="proof_reversible_interface.0" proved="true">
-  <proof prover="0" obsolete="true"><result status="timeout" time="5.000000" steps="1721658"/></proof>
-  <transf name="induction_ty_lex" proved="true" >
-   <goal name="proof_reversible_interface.0.0" proved="true">
-   <proof prover="0"><result status="valid" time="0.062263" steps="32473"/></proof>
+ <goal name="rec_decode&#39;vc" expl="VC for rec_decode">
+ <proof prover="0"><result status="valid" time="0.946924" steps="72503"/></proof>
+ <transf name="split_vc" >
+  <goal name="rec_decode&#39;vc.0" expl="variant decrease">
+  <proof prover="0"><result status="valid" time="0.039848" steps="8669"/></proof>
+  <proof prover="2"><result status="valid" time="0.018229" steps="158"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.1" expl="precondition">
+  <proof prover="2"><result status="valid" time="0.084513" steps="1004"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.2" expl="variant decrease">
+  <proof prover="0"><result status="valid" time="0.041380" steps="8670"/></proof>
+  <proof prover="2"><result status="valid" time="0.015928" steps="121"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.3" expl="precondition">
+  <proof prover="2"><result status="valid" time="0.093682" steps="938"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.4" expl="postcondition">
+  <proof prover="2"><result status="valid" time="4.652068" steps="59649"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.0" expl="unreachable point">
+  <proof prover="0" obsolete="true"><result status="timeout" time="5.000000" steps="358132"/></proof>
+  <proof prover="2"><result status="valid" time="0.021353" steps="247"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="proof_reversible">
+ <transf name="compute_in_goal" >
+  <goal name="proof_reversible.0">
+  <transf name="induction_ty_lex" >
+   <goal name="proof_reversible.0.0">
+   <transf name="split_vc" >
+    <goal name="proof_reversible.0.0.0">
+    <proof prover="0"><result status="valid" time="0.085018" steps="10387"/></proof>
+    </goal>
+    <goal name="proof_reversible.0.0.1">
+    <proof prover="2" memlimit="2000"><result status="valid" time="3.309250" steps="42359"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="encode&#39;vc" expl="VC for encode">
+ <proof prover="0"><result status="valid" time="0.078240" steps="6020"/></proof>
+ <proof prover="1"><result status="valid" time="0.007021" steps="6351"/></proof>
+ </goal>
+ <goal name="decode&#39;vc" expl="VC for decode">
+ <proof prover="0"><result status="valid" time="0.036737" steps="10183"/></proof>
+ <transf name="split_vc" >
+  <goal name="decode&#39;vc.0" expl="precondition">
+  <proof prover="2"><result status="valid" time="0.013286" steps="59"/></proof>
+  </goal>
+  <goal name="decode&#39;vc.1" expl="postcondition">
+  <proof prover="0"><result status="valid" time="0.033269" steps="9015"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="en_de&#39;vc" expl="VC for en_de">
+ <proof prover="2" obsolete="true"><result status="valid" time="0.025523" steps="208"/></proof>
+ </goal>
+ <goal name="proof_reversible_interface">
+ <transf name="compute_in_goal" >
+  <goal name="proof_reversible_interface.0">
+  <transf name="induction_ty_lex" >
+   <goal name="proof_reversible_interface.0.0">
    </goal>
   </transf>
   </goal>
