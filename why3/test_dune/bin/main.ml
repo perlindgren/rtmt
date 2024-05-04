@@ -1,11 +1,11 @@
-open N_cobs
+open Cobs
 open Printf
 
-let rec makeList v i = if i = 0 then [] else i+1000 :: (makeList v (i-1))
+let rec makeList v i = if i = 0 then [] else (i + 1000) :: makeList v (i - 1)
 
 let () =
   (*let input = [] in *)
-  let input = makeList 41 260 in
+  let input = makeList 41 520 in
   (* let input = [ 41; 0 ] in *)
   (* let input = [ 0; 41 ] in *)
   (* let input = [ 41; 0; 42 ] in *)
@@ -23,5 +23,6 @@ let () =
   let decoded = List.map Z.to_int d in
   List.iter (printf "%d ") decoded;
   print_newline ();
-  printf "Len input %d, len decoded %d \n " (List.length input) (List.length decoded);
+  printf "Len input %d, len decoded %d \n " (List.length input)
+    (List.length decoded);
   assert (decoded == input)

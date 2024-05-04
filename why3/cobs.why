@@ -1,13 +1,13 @@
-module NestedCobs
+module Cobs
 
   use int.Int
   use list.ListRich
 
   (* specification *)
   inductive cobs (plain: list int) (encoded: (int, list int))=
-  | EncodeEnd: cobs Nil (1, Cons 0 Nil) 
-  | EncodeZero: forall pl cl: list int, cn:int. cn > 0 -> cn <= 255 -> cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl)
-  | EncodeNonZero: forall l ln: list int, cn e:int. cn > 0 -> cn <= 255 -> cobs l (cn, ln) -> cobs (Cons e l) (1 + cn, Cons e ln) 
+  | End: cobs Nil (1, Cons 0 Nil) 
+  | Zero: forall pl cl: list int, cn:int. cn > 0 -> cn <= 255 -> cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl)
+  | NonZero: forall l ln: list int, cn e:int. cn > 0 -> cn <= 255 -> cobs l (cn, ln) -> cobs (Cons e l) (1 + cn, Cons e ln) 
   (*| EncodeGroug: forall l ln: list int, cn e:int. cn = 255 -> cobs l (cn, ln) -> cobs (Cons e l) (1, Cons 255 (Cons e ln)) *)
   
   (* recursive encoding function *)
@@ -20,11 +20,11 @@ module NestedCobs
       let (n, ln) = rec_encode ll in
       assert { n > 0 };
       (* assert { n <= 255 }; *)
-      if n = 255 then
-        (2, Cons e (Cons 255 ln))
-      else if e = 0 then 
+      if e = 0 then 
         (1, Cons n ln) 
-      else
+      else if n = 254 then
+        (1, Cons 255 (Cons e ln))
+      else 
         (1 + n, Cons e ln)  
     end
   
@@ -35,9 +35,9 @@ module NestedCobs
     | Nil -> Nil
     | Cons _ Nil -> Nil
     | Cons e ll -> 
-        if cn = 255 then
-          rec_decode 2 ll
-        else if cn = 1 then
+        if cn = 1 then if e = 255 then
+          rec_decode 255 ll
+        else 
           Cons 0 (rec_decode e ll) 
         else
           Cons e (rec_decode (cn - 1) ll) 
