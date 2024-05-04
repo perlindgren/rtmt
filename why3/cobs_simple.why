@@ -32,9 +32,6 @@ module NestedCobs
   
   (* recursive decoding function *)  
   let rec function rec_decode (cn: int) (cl: list int) : list int
-    requires { exists r. cobs r (cn, cl) }
-    variant { cl }
-    ensures { cobs result (cn, cl) }
     = match cl with
     | Nil -> Nil
     | Cons _ Nil -> Nil
@@ -55,35 +52,11 @@ module NestedCobs
     Cons cn cl
     
   let function decode (l: list int) : list int
-    requires {
-      match l with
-      | Nil -> true
-      | Cons n ll -> exists r. cobs r (n, ll)
-      end
-    }
-    ensures {
-      match l with
-      | Nil -> true
-      | Cons n ll -> cobs result (n, ll)
-      end
-    }
   = match l with
     | Nil -> Nil 
     | Cons cn cl -> 
       rec_decode cn cl
     end
-    
-  let lemma en_de (l: list int) : list int
-    ensures { result = l }
-    = 
-      let c:list int = encode l in
-      match c with 
-      | Nil -> absurd
-      | Cons cn cl ->  
-        assert { cobs l (cn, cl) };
-        let r: list int = decode c in
-        r
-      end 
       
   goal proof_reversible_interface: 
     forall l [@induction] : list int. 
