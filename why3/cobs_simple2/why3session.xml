@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.5.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="cobs_simple2.why"/>
+<theory name="NestedCobs" proved="true">
+ <goal name="unique" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="unique.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.183820" steps="2393"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="unique2" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="unique2.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.409560" steps="5281"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="rec_encode&#39;vc" expl="VC for rec_encode" proved="true">
+ <proof prover="0"><result status="valid" time="2.787195" steps="268365"/></proof>
+ </goal>
+ <goal name="rec_decode&#39;vc" expl="VC for rec_decode" proved="true">
+ <proof prover="0"><result status="valid" time="1.676949" steps="147878"/></proof>
+ </goal>
+ <goal name="proof_reversible" proved="true">
+ <proof prover="0"><result status="valid" time="0.061702" steps="11540"/></proof>
+ </goal>
+ <goal name="encode&#39;vc" expl="VC for encode" proved="true">
+ <proof prover="0"><result status="valid" time="0.026416" steps="6067"/></proof>
+ </goal>
+ <goal name="decode&#39;vc" expl="VC for decode" proved="true">
+ <proof prover="0"><result status="valid" time="0.045917" steps="10274"/></proof>
+ </goal>
+ <goal name="en_de&#39;vc" expl="VC for en_de" proved="true">
+ <proof prover="0"><result status="valid" time="0.105541" steps="17991"/></proof>
+ </goal>
+ <goal name="proof_reversible_interface" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="proof_reversible_interface.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.152222" steps="1511"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>
