@@ -4,13 +4,12 @@ module NestedCobs
   use int.Abs
   use list.ListRich
 
-(*   
+  (*
   (Cons 0 Nil) (-1) -> (Cons (-1) (Cons 1 Nil))
   (Cons 41 Nil) (-1) -> (Cons 41 (Cons (-2) Nil))
   *)
-  
   (* specification *)
-  (* inductive n_cobs (plain: list int) (n: int) (coded: (list int)) =
+  inductive n_cobs (plain: list int) (n: int) (coded: (list int)) =
   | End:      forall n. n <> 0 -> 
                 n_cobs Nil n (Cons 0 Nil) 
   | Zero:     forall pl cl: list int, cn:int. n_cobs pl cn cl -> 
@@ -21,7 +20,7 @@ module NestedCobs
   | NonZero2: forall pl cl: list int, cn e:int. e <> 0 -> cn > 1 -> n_cobs pl cn cl -> 
                 n_cobs (Cons e pl) (cn - 1) (Cons cn cl) 
                 *)
-   *)
+  
   predicate non_nil (l: list int) =
     l <> Nil
     
@@ -33,7 +32,6 @@ module NestedCobs
     variant { l }
     ensures { 
       (* (n_cobs l n result) /\ *)
-      (* rec_decode result = (l, n) /\ *)
       (non_nil result) /\ 
       (non_zero result) 
     }
@@ -49,18 +47,15 @@ module NestedCobs
         Cons e r
     end
     
-  with function rec_decode (l: list int): (list int, int) 
+  lemma encode_unique:
+    forall l, r1, r2. r1 = rec_encode l -> r2 = rec_encode l -> r1 = r2
+      
+  let rec function rec_decode (l: list int): (list int, int) 
     requires { 
       (non_nil l) 
     }
     variant { l } 
-    (*
-    ensures {
-      forall plain [@induction]. rec_encode plain (-1) = l ->
-        let (r, _) = result in
-          r = plain
-    }*)
-  = match l with 
+  = match l with
     | Nil -> absurd 
     | Cons n Nil -> (Nil, n)
     | Cons n ll ->
@@ -74,20 +69,14 @@ module NestedCobs
         (Cons n dl, prev)
     end
     
-  lemma encode_unique:
-    forall l, r1, r2. r1 = rec_encode l -> r2 = rec_encode l -> r1 = r2
-    
   lemma decode_unique:
     forall l, r1, r2. r1 = rec_decode l -> r2 = rec_decode l -> r1 = r2
     
-  (*
   goal invert:
     forall l [@induction] r [@induction] rr: list int, n. 
       r = rec_encode l (-1) ->
         (rr, n) = rec_decode r ->
           l = rr 
-          
-   *)
       
 
   (* why3 execute n_cobs.why --use=NestedCobs 'test_encode ()' *)
