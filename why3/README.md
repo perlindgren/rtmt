@@ -12,6 +12,12 @@
 why3 ide cobs.why
 ```
 
+## Testing
+
+```shell
+why3 execute n_cobs.why --use=NestedCobs 'test_encode ()'
+```
+
 ## Extraction
 
 ```shell
