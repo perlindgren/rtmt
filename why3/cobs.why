@@ -6,37 +6,70 @@ module Cobs
   (* specification *)
   inductive cobs (plain: list int) (encoded: (int, list int))=
   | End: cobs Nil (1, Cons 0 Nil) 
-  | Zero: forall pl cl: list int, cn:int. cn > 0 -> cn <= 255 -> cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl)
-  | NonZero: forall l ln: list int, cn e:int. cn > 0 -> cn <= 255 -> cobs l (cn, ln) -> cobs (Cons e l) (1 + cn, Cons e ln) 
-  (*| EncodeGroug: forall l ln: list int, cn e:int. cn = 255 -> cobs l (cn, ln) -> cobs (Cons e l) (1, Cons 255 (Cons e ln)) *)
+  | Zero: forall pl cl: list int, cn:int. 0 < cn < 255 -> cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl)
+  | NonZero: forall pl cl: list int, cn e:int. 0 < e <= 255 -> 0 < cn < 255 -> cobs pl (cn, cl) -> cobs (Cons e pl) (1 + cn, Cons e cl) 
+  | GroupZero: forall pl cl: list int. cobs pl (255, cl) -> cobs (Cons 0 pl) (1, (Cons 255 cl))
+  | GroupNonZero: forall pl cl: list int, e:int. 0 < e <= 255 -> cobs pl (255, cl) -> cobs (Cons e pl) (1, (Cons e (Cons 255 cl)))
+
+  lemma unique:
+    forall p [@induction] en1 en2. cobs p en1 -> cobs p en2 -> en1 = en2
+    
+  lemma unique2:
+    forall p1 p2 [@induction] en. cobs p1 en -> cobs p2 en -> p1 = p2
+    
+  lemma range_cn:
+    forall p [@induction] cn cl. cobs p (cn, cl) -> 0 <= cn <= 255
+    
+  lemma range_cl:
+    forall p [@induction] cn cl e. cobs p (cn, cl) -> mem e cl -> 0 <= e <= 255
+     
   
+  (*  
+  predicate in_range (r: (int, list int)) =
+    match r with
+      | n, cl -> 
+        0 < n < 255 /\ 
+        match cl with
+        | Cons e Nil -> e = 0
+        | _ -> forall e. mem e cl -> 0 < e <= 255
+        end
+    end
+    
+  
+
   (* recursive encoding function *)
   let rec function rec_encode (l: list int) : (int, list int)
-    ensures { cobs l result }
+    (* ensures { cobs l result } *)
+    variant { l }
+    ensures { in_range result }
     = 
     match l with
     | Nil -> (1, Cons 0 Nil) 
     | Cons e ll -> 
       let (n, ln) = rec_encode ll in
-      assert { n > 0 };
-      (* assert { n <= 255 }; *)
-      if e = 0 then 
-        (1, Cons n ln) 
-      else if n = 254 then
-        (1, Cons 255 (Cons e ln))
-      else 
-        (1 + n, Cons e ln)  
+      assert { 0 < n < 255 };
+      let r = 
+        if e = 0 then 
+          (1, Cons n ln) 
+        else if n = 254 then
+          (1, Cons 255 (Cons e ln))
+        else 
+          (1 + n, Cons e ln) in
+      assert { in_range r };
+      r
+        
     end
   
   (* recursive decoding function *)  
   let rec function rec_decode (cn: int) (cl: list int) : list int
+      requires { in_range (cn, cl) }
       variant  { cl }
     = match cl with
     | Nil -> Nil
     | Cons _ Nil -> Nil
     | Cons e ll -> 
         if cn = 1 then if e = 255 then
-          rec_decode 255 ll
+          rec_decode 1 ll
         else 
           Cons 0 (rec_decode e ll) 
         else
@@ -61,4 +94,5 @@ module Cobs
   goal proof_reversible_interface: 
     forall l [@induction] : list int. 
     decode (encode l) = l 
+    *)
 end

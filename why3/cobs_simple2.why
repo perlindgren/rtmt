@@ -1,4 +1,4 @@
-module NestedCobs
+module Cobs
 
   use int.Int
   use list.ListRich

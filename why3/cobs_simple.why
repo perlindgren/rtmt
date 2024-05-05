@@ -1,4 +1,4 @@
-module NestedCobs
+module Cobs 
 
   use int.Int
   use list.ListRich
@@ -14,7 +14,7 @@ module NestedCobs
     
   lemma unique2:
     forall p1 [@induction] p2 [@induction] en. cobs p1 en -> cobs p2 en -> p1 = p2
-    
+  
   (* recursive encoding function *)
   let rec function rec_encode (l: list int) : (int, list int)
     ensures { cobs l result }
