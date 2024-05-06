@@ -8,9 +8,11 @@ module Cobs
   | End: cobs Nil (1, Cons 0 Nil) 
   | Zero: forall pl cl: list int, cn:int. 0 < cn < 255 -> cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl)
   | NonZero: forall pl cl: list int, cn e:int. 0 < e <= 255 -> 0 < cn < 255 -> cobs pl (cn, cl) -> cobs (Cons e pl) (1 + cn, Cons e cl) 
+  
+  (*
   | GroupZero: forall pl cl: list int. cobs pl (255, cl) -> cobs (Cons 0 pl) (1, (Cons 255 cl))
   | GroupNonZero: forall pl cl: list int, e:int. 0 < e <= 255 -> cobs pl (255, cl) -> cobs (Cons e pl) (1, (Cons e (Cons 255 cl)))
-
+  *)
   lemma unique:
     forall p [@induction] en1 en2. cobs p en1 -> cobs p en2 -> en1 = en2
     
@@ -23,8 +25,6 @@ module Cobs
   lemma range_cl:
     forall p [@induction] cn cl e. cobs p (cn, cl) -> mem e cl -> 0 <= e <= 255
      
-  
-  (*  
   predicate in_range (r: (int, list int)) =
     match r with
       | n, cl -> 
@@ -66,10 +66,10 @@ module Cobs
       variant  { cl }
     = match cl with
     | Nil -> Nil
-    | Cons _ Nil -> Nil
+    | Cons _ Nil -> Nil (* match last *)
     | Cons e ll -> 
         if cn = 1 then if e = 255 then
-          rec_decode 1 ll
+          rec_decode 255 ll 
         else 
           Cons 0 (rec_decode e ll) 
         else
@@ -94,5 +94,35 @@ module Cobs
   goal proof_reversible_interface: 
     forall l [@induction] : list int. 
     decode (encode l) = l 
-    *)
+  
+
+  let test_encode() =
+    encode Nil 
+
+  let test_encode_41() =
+    encode (Cons 41 Nil) 
+
+  let test_encode_0() =
+    encode (Cons 0 Nil) 
+
+  let test_encode_41_42_43() =
+    encode (Cons 41 (Cons 42 (Cons 43 Nil))) 
+
+  let test_encode_41_0_43() =
+    encode (Cons 41 (Cons 0 (Cons 43 Nil))) 
+
+  let test () =
+    decode(test_encode () ) 
+
+  let test_41 () =
+    decode(test_encode_41 ())
+
+  let test_41_42_43 () =
+    decode(test_encode_41_42_43 ())
+
+  let test_0 () =
+    decode(test_encode_0 ())
+
+  let test_41_0_43 () =
+    decode(test_encode_41_0_43 ()) 
 end

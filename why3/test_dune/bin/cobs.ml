@@ -31,3 +31,25 @@ let decode (l: (Z.t) list) : (Z.t) list =
   | [] -> [] 
   | cn1 :: cl1 -> rec_decode cn1 cl1
 
+let test_encode (_: unit) : (Z.t) list = encode ([] )
+
+let test_encode_41 (_: unit) : (Z.t) list = encode (Z.of_string "41" :: [] )
+
+let test_encode_0 (_: unit) : (Z.t) list = encode (Z.zero :: [] )
+
+let test_encode_41_42_43 (_: unit) : (Z.t) list =
+  encode (Z.of_string "41" :: Z.of_string "42" :: Z.of_string "43" :: [] )
+
+let test_encode_41_0_43 (_: unit) : (Z.t) list =
+  encode (Z.of_string "41" :: Z.zero :: Z.of_string "43" :: [] )
+
+let test (_: unit) : (Z.t) list = decode (test_encode ())
+
+let test_41 (_: unit) : (Z.t) list = decode (test_encode_41 ())
+
+let test_41_42_43 (_: unit) : (Z.t) list = decode (test_encode_41_42_43 ())
+
+let test_0 (_: unit) : (Z.t) list = decode (test_encode_0 ())
+
+let test_41_0_43 (_: unit) : (Z.t) list = decode (test_encode_41_0_43 ())
+
