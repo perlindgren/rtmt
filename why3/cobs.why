@@ -3,94 +3,123 @@ module Cobs
   use int.Int
   use list.ListRich
 
+  predicate valid_list (l: list int) =
+    forall e. mem e l -> 0 <= e <= 255
+    
+  predicate valid (plain: list int) (cn: int) (cl: list int) =
+    valid_list plain /\ valid_list cl /\ (0 < cn <= 255) 
+    
   (* specification *)
-  inductive cobs (plain: list int) (encoded: (int, list int))=
+  inductive cobs (plain: list int) (encoded: (int, list int)) =
   | End: cobs Nil (1, Cons 0 Nil) 
-  | Zero: forall pl cl: list int, cn:int. 0 < cn < 255 -> cobs pl (cn, cl) -> cobs (Cons 0 pl) (1, Cons cn cl)
-  | NonZero: forall pl cl: list int, cn e:int. 0 < e <= 255 -> 0 < cn < 255 -> cobs pl (cn, cl) -> cobs (Cons e pl) (1 + cn, Cons e cl) 
   
-  (*
-  | GroupZero: forall pl cl: list int. cobs pl (255, cl) -> cobs (Cons 0 pl) (1, (Cons 255 cl))
-  | GroupNonZero: forall pl cl: list int, e:int. 0 < e <= 255 -> cobs pl (255, cl) -> cobs (Cons e pl) (1, (Cons e (Cons 255 cl)))
-  *)
-  lemma unique:
-    forall p [@induction] en1 en2. cobs p en1 -> cobs p en2 -> en1 = en2
+  | Zero: forall pl cl: list int, cn:int. valid pl cn cl -> 
+           cobs pl (cn, cl) -> 
+              cobs (Cons 0 pl) (1, Cons cn cl)
+  
+  | Group: forall pl cl: list int, cn e: int. valid pl cn cl -> 
+            0 < e <= 255 -> cobs pl (254, cl) -> 
+              cobs (Cons e pl) (1, Cons 255 (Cons e cl)) 
+              
+  | NonZero: forall pl cl: list int, cn e:int. valid pl cn cl -> 
+            0 < e <= 255 -> 0 < cn < 254 -> 
+              cobs pl (cn, cl) -> cobs (Cons e pl) (1 + cn, Cons e cl) 
+              
+  lemma cobs_valid:
+    forall pl [@induction] cn cl. cobs pl (cn, cl) -> valid pl cn cl 
     
-  lemma unique2:
-    forall p1 p2 [@induction] en. cobs p1 en -> cobs p2 en -> p1 = p2
+  lemma cobs_exists:
+    forall pl [@induction]. valid_list pl -> exists cn cl. cobs pl (cn, cl) 
     
-  lemma range_cn:
-    forall p [@induction] cn cl. cobs p (cn, cl) -> 0 <= cn <= 255
+  lemma cobs_range_cn:
+    forall pl cn cl. cobs pl (cn, cl) -> 0 <= cn <= 255
     
-  lemma range_cl:
-    forall p [@induction] cn cl e. cobs p (cn, cl) -> mem e cl -> 0 <= e <= 255
+  lemma cobs_range_cl:
+    forall pl [@induction] cn cl [@induction]. cobs pl (cn, cl) -> 
+      forall e. mem e cl -> 0 <= e <= 255
+ 
      
-  predicate in_range (r: (int, list int)) =
-    match r with
-      | n, cl -> 
-        0 < n < 255 /\ 
-        match cl with
-        | Cons e Nil -> e = 0
-        | _ -> forall e. mem e cl -> 0 < e <= 255
-        end
-    end
+  lemma unique:
+    forall pl [@induction] cl1 [@induction] cl2 [@induction]: list int, cn1 cn2. 
+      valid_list pl /\ cobs pl (cn1, cl1) /\ cobs pl (cn2, cl2) -> 
+        cn1 = cn2 /\ cl1 = cl2 
+        
+  lemma unique2:
+    forall p1 [@induction] p2 [@induction] en. valid_list p1 -> valid_list p2 -> cobs p1 en -> cobs p2 en -> p1 = p2   
     
-  
-
   (* recursive encoding function *)
-  let rec function rec_encode (l: list int) : (int, list int)
-    (* ensures { cobs l result } *)
-    variant { l }
-    ensures { in_range result }
+  let rec function rec_encode (p: list int) : (int, list int)
+    requires { valid_list p }
+    requires { exists nc lc. cobs nc lc }
+    variant { p }
+    ensures { cobs p result } 
+    (* ensures { in_range result } *)
     = 
-    match l with
+    match p with
     | Nil -> (1, Cons 0 Nil) 
-    | Cons e ll -> 
-      let (n, ln) = rec_encode ll in
-      assert { 0 < n < 255 };
+    | Cons e pl -> 
+      let (cn, cl) = rec_encode pl in
+      (* assert { 0 < cn < 255 }; *)
       let r = 
         if e = 0 then 
-          (1, Cons n ln) 
-        else if n = 254 then
-          (1, Cons 255 (Cons e ln))
+          (1, Cons cn cl) 
+        else if cn = 254 then
+          (1, Cons 255 (Cons e cl))
         else 
-          (1 + n, Cons e ln) in
-      assert { in_range r };
-      r
-        
+          (1 + cn, Cons e cl) in
+      (* assert { in_range r }; *)
+      r 
     end
   
   (* recursive decoding function *)  
   let rec function rec_decode (cn: int) (cl: list int) : list int
-      requires { in_range (cn, cl) }
+      requires { exists r. cobs r (cn, cl) }
       variant  { cl }
+      ensures  { cobs result (cn, cl) /\ valid_list result }
     = match cl with
     | Nil -> Nil
     | Cons _ Nil -> Nil (* match last *)
     | Cons e ll -> 
-        if cn = 1 then if e = 255 then
-          rec_decode 255 ll 
-        else 
-          Cons 0 (rec_decode e ll) 
-        else
+        if cn = 1 then begin 
+          if e = 255 then begin
+            assert { valid_list ll };
+            assert { valid_list (Cons 255 ll) };
+            assert { exists x y. cobs x (y, ll) };
+            let r = rec_decode 255 ll in
+            assert { valid_list r };
+            r
+          end else 
+            Cons 0 (rec_decode e ll) 
+        end else
           Cons e (rec_decode (cn - 1) ll) 
     end
   
-  goal proof_reversible: forall l [@induction] : list int. 
-    let (nc, nl) = rec_encode l in 
-    rec_decode nc nl = l 
+  
+  goal proof_reversible: forall p [@induction] : list int. 
+    valid_list p -> 
+    forall e. mem e p -> 0 <= e <= 255 ->
+      let (nc, nl) = rec_encode p in 
+      rec_decode nc nl = p 
     
+   
   (* extractable interface *)
   let function encode (l: list int) : list int
+    requires { valid_list l }
   = let (cn, cl) = rec_encode l in
     Cons cn cl
     
   let function decode (l: list int) : list int
+    requires { 
+    match l with
+     | Nil -> true  
+     | Cons cn cl -> exists r. cobs r (cn, cl) 
+    end
+    }
   = match l with
     | Nil -> Nil 
     | Cons cn cl -> rec_decode cn cl
     end
-    
+  (*  
   goal proof_reversible_interface: 
     forall l [@induction] : list int. 
     decode (encode l) = l 
@@ -125,4 +154,6 @@ module Cobs
 
   let test_41_0_43 () =
     decode(test_encode_41_0_43 ()) 
+   
+  *)
 end

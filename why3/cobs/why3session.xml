@@ -2,18 +2,281 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.5.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.0.1-dev.2.77d0bec48" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.9-prerelease" timelimit="5" steplimit="0" memlimit="4000"/>
+<prover id="3" name="Z3" version="4.13.1" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="4" name="Eprover" version="2.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC5" version="1.0.1-dev.2.77d0bec48" alternative="strings" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.5.3" alternative="BV" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="cobs.why"/>
 <theory name="Cobs">
- <goal name="rec_encode&#39;vc" expl="VC for rec_encode">
+ <goal name="cobs_valid" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="cobs_valid.0" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="cobs_valid.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.025916" steps="590"/></proof>
+   </goal>
+   <goal name="cobs_valid.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.506618" steps="13169"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="cobs_exists" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="cobs_exists.0" proved="true">
+  <transf name="split_goal_full" proved="true" >
+   <goal name="cobs_exists.0.0" proved="true">
+   <proof prover="1"><result status="valid" time="0.047959" steps="9367"/></proof>
+   </goal>
+   <goal name="cobs_exists.0.1" proved="true">
+   <transf name="compute_in_goal" proved="true" >
+    <goal name="cobs_exists.0.1.0" proved="true">
+    <proof prover="1" timelimit="1"><result status="valid" time="1.397265" steps="620039"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="cobs_exists.0.2" proved="true">
+   <proof prover="1"><result status="valid" time="0.323058" steps="134677"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="cobs_range_cn" proved="true">
+ <proof prover="0"><result status="valid" time="0.009819" steps="61"/></proof>
+ </goal>
+ <goal name="cobs_range_cl" proved="true">
+ <proof prover="0"><result status="valid" time="0.039684" steps="973"/></proof>
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="cobs_range_cl.0" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="cobs_range_cl.0.0" proved="true">
+   <proof prover="1"><result status="valid" time="0.021521" steps="9588"/></proof>
+   </goal>
+   <goal name="cobs_range_cl.0.1" proved="true">
+   <proof prover="1"><result status="valid" time="0.026179" steps="9587"/></proof>
+   </goal>
+   <goal name="cobs_range_cl.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.039905" steps="2636"/></proof>
+   <proof prover="1"><result status="valid" time="0.025817" steps="11024"/></proof>
+   </goal>
+   <goal name="cobs_range_cl.0.3" proved="true">
+   <proof prover="1"><result status="valid" time="0.021036" steps="11023"/></proof>
+   </goal>
+   <goal name="cobs_range_cl.0.4" proved="true">
+   <proof prover="0"><result status="valid" time="0.089510" steps="19"/></proof>
+   <proof prover="1"><result status="valid" time="0.019366" steps="9729"/></proof>
+   </goal>
+   <goal name="cobs_range_cl.0.5" proved="true">
+   <proof prover="1"><result status="valid" time="0.029669" steps="9728"/></proof>
+   </goal>
+   <goal name="cobs_range_cl.0.6" proved="true">
+   <proof prover="0"><result status="valid" time="0.092294" steps="2252"/></proof>
+   <proof prover="1"><result status="valid" time="0.440959" steps="194865"/></proof>
+   </goal>
+   <goal name="cobs_range_cl.0.7" proved="true">
+   <proof prover="0"><result status="valid" time="0.045259" steps="2251"/></proof>
+   <proof prover="1"><result status="valid" time="0.421597" steps="195371"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="unique" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="unique.0" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="unique.0.0" proved="true">
+   <proof prover="0"><result status="valid" time="0.009810" steps="2773"/></proof>
+   <proof prover="1"><result status="valid" time="0.019868" steps="10949"/></proof>
+   </goal>
+   <goal name="unique.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.006168" steps="14"/></proof>
+   <proof prover="1"><result status="valid" time="0.012464" steps="9070"/></proof>
+   </goal>
+   <goal name="unique.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.029115" steps="3358"/></proof>
+   <proof prover="1"><result status="valid" time="0.018755" steps="11196"/></proof>
+   </goal>
+   <goal name="unique.0.3" proved="true">
+   <proof prover="0"><result status="valid" time="0.029041" steps="3315"/></proof>
+   <proof prover="1"><result status="valid" time="0.029031" steps="11175"/></proof>
+   </goal>
+   <goal name="unique.0.4" proved="true">
+   <proof prover="0"><result status="valid" time="0.131353" steps="3425"/></proof>
+   <proof prover="1"><result status="valid" time="0.027749" steps="11192"/></proof>
+   </goal>
+   <goal name="unique.0.5" proved="true">
+   <proof prover="0"><result status="valid" time="0.033696" steps="3827"/></proof>
+   <proof prover="1"><result status="valid" time="0.019361" steps="11171"/></proof>
+   </goal>
+   <goal name="unique.0.6" proved="true">
+   <proof prover="0"><result status="valid" time="0.099578" steps="4388"/></proof>
+   <proof prover="1"><result status="valid" time="0.022825" steps="11541"/></proof>
+   <proof prover="2" timelimit="30"><result status="valid" time="0.027485"/></proof>
+   <proof prover="3" timelimit="30"><result status="valid" time="0.009728" steps="58730"/></proof>
+   </goal>
+   <goal name="unique.0.7" proved="true">
+   <proof prover="0"><result status="valid" time="0.135076" steps="4359"/></proof>
+   <proof prover="1"><result status="valid" time="0.023282" steps="11575"/></proof>
+   <proof prover="2" memlimit="1000"><result status="valid" time="0.016303"/></proof>
+   </goal>
+   <goal name="unique.0.8" proved="true">
+   <proof prover="0"><result status="valid" time="0.122243" steps="3915"/></proof>
+   </goal>
+   <goal name="unique.0.9" proved="true">
+   <proof prover="0"><result status="valid" time="0.005680" steps="14"/></proof>
+   </goal>
+   <goal name="unique.0.10" proved="true">
+   <proof prover="0"><result status="valid" time="0.013856" steps="2820"/></proof>
+   </goal>
+   <goal name="unique.0.11" proved="true">
+   <proof prover="0"><result status="valid" time="0.009700" steps="2784"/></proof>
+   </goal>
+   <goal name="unique.0.12" proved="true">
+   <proof prover="0"><result status="valid" time="0.014443" steps="2234"/></proof>
+   </goal>
+   <goal name="unique.0.13" proved="true">
+   <proof prover="0"><result status="valid" time="0.017389" steps="2249"/></proof>
+   </goal>
+   <goal name="unique.0.14" proved="true">
+   <proof prover="0"><result status="valid" time="2.197721" steps="55188"/></proof>
+   </goal>
+   <goal name="unique.0.15" proved="true">
+   <proof prover="0"><result status="valid" time="2.061520" steps="54217"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="unique2" proved="true">
+ <transf name="induction_ty_lex" proved="true" >
+  <goal name="unique2.0" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="unique2.0.0" proved="true">
+   <proof prover="1" timelimit="30" memlimit="4000"><result status="valid" time="0.018630" steps="9385"/></proof>
+   <proof prover="2" timelimit="30"><result status="valid" time="0.011001"/></proof>
+   </goal>
+   <goal name="unique2.0.1" proved="true">
+   <proof prover="0"><result status="valid" time="0.056719" steps="2327"/></proof>
+   <proof prover="5"><result status="valid" time="0.042462" steps="21522"/></proof>
+   </goal>
+   <goal name="unique2.0.2" proved="true">
+   <proof prover="0"><result status="valid" time="0.053114" steps="2299"/></proof>
+   <proof prover="5"><result status="valid" time="0.046181" steps="21503"/></proof>
+   </goal>
+   <goal name="unique2.0.3" proved="true">
+   <proof prover="5"><result status="valid" time="0.256295" steps="79717"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="rec_encode&#39;vc" expl="VC for rec_encode" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="rec_encode&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.012069" steps="96"/></proof>
+  <proof prover="6"><result status="valid" time="0.007474" steps="96"/></proof>
+  </goal>
+  <goal name="rec_encode&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.172322" steps="4436"/></proof>
+  </goal>
+  <goal name="rec_encode&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.007129" steps="15"/></proof>
+  <proof prover="1"><result status="valid" time="0.020317" steps="9783"/></proof>
+  <proof prover="5"><result status="valid" time="0.066446" steps="9783"/></proof>
+  </goal>
+  <goal name="rec_encode&#39;vc.3" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="rec_encode&#39;vc.3.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.006858" steps="12"/></proof>
+   </goal>
+   <goal name="rec_encode&#39;vc.3.1" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="1"><result status="valid" time="0.520779" steps="203961"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="rec_decode&#39;vc" expl="VC for rec_decode">
+ <transf name="split_vc" >
+  <goal name="rec_decode&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="0"><result status="valid" time="0.143638" steps="3273"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.045315" steps="26396"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.2" expl="assertion">
+  <proof prover="0"><result status="timeout" time="5.000000" steps="95232"/></proof>
+  <proof prover="1"><result status="timeout" time="5.000000" steps="1263494"/></proof>
+  <proof prover="2" memlimit="1000" obsolete="true"><result status="timeout" time="5.000000"/></proof>
+  <transf name="split_vc" >
+   <goal name="rec_decode&#39;vc.2.0" expl="assertion">
+   <proof prover="0" timelimit="10" memlimit="4000" obsolete="true"><result status="timeout" time="10.000000" steps="177231"/></proof>
+   <proof prover="1" timelimit="10" memlimit="4000" obsolete="true"><result status="timeout" time="10.000000" steps="4507195"/></proof>
+   <proof prover="2" timelimit="10" obsolete="true"><result status="timeout" time="10.000000"/></proof>
+   <proof prover="3" obsolete="true"><result status="timeout" time="10.000000" steps="3305584"/></proof>
+   <proof prover="4" obsolete="true"><result status="timeout" time="1.000000"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="rec_decode&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.009877" steps="390"/></proof>
+  <proof prover="1"><result status="valid" time="0.015416" steps="10031"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.4" expl="precondition">
+  <proof prover="0"><result status="timeout" time="5.000000" steps="69238"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.5" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.018352" steps="9641"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.6" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.011397" steps="288"/></proof>
+  <proof prover="1"><result status="valid" time="0.022452" steps="9988"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.052415" steps="1732"/></proof>
+  <proof prover="1"><result status="valid" time="0.026150" steps="13865"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.8" expl="variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.009602" steps="285"/></proof>
+  <proof prover="1"><result status="valid" time="0.017704" steps="9980"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.066795" steps="3660"/></proof>
+  <proof prover="1"><result status="valid" time="1.205420" steps="338957"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.10" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="rec_decode&#39;vc.10.0" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.374738" steps="179147"/></proof>
+   </goal>
+   <goal name="rec_decode&#39;vc.10.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.397480" steps="188672"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
- <goal name="proof_reversible">
+ <goal name="proof_reversible" proved="true">
+ <proof prover="0"><result status="valid" time="0.031581" steps="384"/></proof>
  </goal>
- <goal name="encode&#39;vc" expl="VC for encode">
+ <goal name="encode&#39;vc" expl="VC for encode" proved="true">
+ <proof prover="0"><result status="valid" time="0.007562" steps="13"/></proof>
+ <proof prover="6" obsolete="true"><result status="timeout" time="5.000000" steps="118247"/></proof>
  </goal>
- <goal name="proof_reversible_interface">
+ <goal name="decode&#39;vc" expl="VC for decode" proved="true">
+ <proof prover="0"><result status="valid" time="0.003461" steps="2"/></proof>
+ <transf name="split_vc" >
+  <goal name="decode&#39;vc.0" expl="precondition">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.013630" steps="195"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>
