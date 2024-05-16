@@ -2,45 +2,41 @@ module NestedCobs
 
   use int.Int
   use int.Abs
-  use list.ListRich
+  use list.List
+  use list.NthNoOpt
+  use list.Length
+  use list.Append
   use int.ComputerDivision
-  
-  (* specification *)
-  inductive n_cobs (plain: list int) (coded: list int) =
-  | End:    forall n. n_cobs Nil (Cons n Nil) 
-  | Zero:   forall pl cl: list int, pn:int. 
-              n_cobs pl cl -> n_cobs (Cons 0 pl) (Cons pn cl)
-  | NZero:  forall pl cl: list int, pn:int. 
-              n_cobs pl cl -> n_cobs (Cons pn pl) (Cons pn cl)
-          
-  let rec function rec_encode (pn: int) (pl: list int) : list int
-    variant { pl }
-    ensures { n_cobs pl result }
-  = match pl with
-    | Nil -> Cons pn Nil
-    | Cons e pll ->
-      if e = 0 then Cons pn (rec_encode 1 pll)
-      else if pn >= 0 then Cons e (rec_encode (pn + 1) pll)
-      else Cons e (rec_encode (pn - 1) pll) 
-    end 
 
   let rec function rec_decode (cl: list int) : (int, list int)
-    requires { 
-      exists pl. n_cobs pl cl
-    }
+    requires { cl <> Nil }
     variant { cl }
-    ensures {
-      let dn, dl = result in
-      n_cobs dl cl
-    }
   = match cl with
     | Nil -> absurd
     | Cons cn Nil -> (cn, Nil)
     | Cons cn cll ->
-      let dn, dl = rec_decode cll in
+      let dn, dl = rec_decode cll in 
       if dn = 1 then (cn, Cons 0 dl)
-      else ((if dn > 0 then dn - 1 else dn + 1), Cons cn dl)
+      else ((if dn > 0 then dn - 1 else dn + 1), Cons cn dl) 
     end
+         
+  let rec function rec_encode (pn: int) (pl: list int) : list int
+    requires { pn <> 0 }
+    variant { pl } 
+    ensures { result <> Nil }
+    ensures { length result = 1 + length pl }
+    ensures { 
+      let dn, dl = rec_decode result in
+      (dn = pn) /\ (dl = pl)
+    } 
+  = match pl with
+    | Nil -> Cons pn Nil
+    | Cons e pll ->
+      if e = 0 then Cons pn (rec_encode 1 pll)
+      else if pn > 0 then Cons e (rec_encode (pn + 1) pll)
+      else if pn < 0 then Cons e (rec_encode (pn - 1) pll) 
+      else absurd
+    end 
     
   let rec function strip_end (l: list int) : list int
     requires {
@@ -60,9 +56,7 @@ module NestedCobs
     
   (* extractable interface *)
   let function decode (l: list int) : list int
-    requires {
-      l <> Nil /\ exists pl. n_cobs pl (strip_end l) 
-    }
+    requires { length l > 1 }
   = let _, r = rec_decode (strip_end l) in r
   
 
@@ -84,9 +78,12 @@ module NestedCobs
     else 
       Cons (if mod n m = 0 then 0 else 41) (gen_a0 (n - 1) m)
 
+  let test (l: list int)
+  = l, encode l, decode (encode l)
+  
   let test_encode_a (n:int) 
     requires { n >= 0 }
-  = (gen_a n), encode (gen_a n) 
+  = test (gen_a n)
 
   let test_encode_0a (n:int) 
     requires { n >= 0 }
@@ -94,7 +91,7 @@ module NestedCobs
 
   let test_encode_am (n:int) (m:int)
     requires { n >= 0 /\ m <> 0 }
-  = gen_a0 n m, encode (gen_a0 n m) 
+  = test (gen_a0 n m)
 
   let test_encode_0am (n:int) (m:int)
     requires { n >= 0 /\ m <> 0 }
@@ -104,45 +101,26 @@ module NestedCobs
     requires { n >= 0 /\ m <> 0 }
   = mod n m
 
-  let test_decode () =
-    decode ( Cons (-1) (Cons 41 (Cons (2) (Cons 1 (Cons 1 (Cons 0 Nil))))))
 
-  (* let test_encode() =
-    rec_encode Nil (-1)
-
-  let test_encode_41() =
-    rec_encode (Cons 41 Nil) (-1) 
-
-  let test_encode_41_42_43() =
-    rec_encode (Cons 41 (Cons 42 (Cons 43 Nil))) (-1) 
-
-  (*
-  (Cons 0 Nil) (-1) -> (Cons (-1) (Cons 1 Nil))
-  *)
-  let test_encode_0 () =
-    rec_encode (Cons 0 Nil) (-1) 
-
-  let test_encode_41_0_42 () =
-    rec_encode (Cons 41 (Cons 0 (Cons 42 Nil))) (-1)  *)
-
+  (* encoding examples *)
+  let t ()
+  = rec_encode (-1) (Cons 41 Nil)
   
-(*
-  let test_d () =
-   decode (Cons 3 (Cons 41 (Cons 0 Nil))) *)
+  let t2 ()
+  = rec_decode (rec_encode (-1) (Cons 41 (Cons 42 Nil)))
+  
+  let t3 ()
+  = rec_decode (rec_encode (-1) (Cons 0 Nil))
 
-  (* let test () =
-    rec_decode(test_encode () )  *)
-
-  (* let test_41 () =
-    rec_decode(test_encode_41 ())
-
-  let test_41_42_43 () =
-    rec_decode(test_encode_41_42_43 ())
-
-  let test_0 () =
-    rec_decode(test_encode_0 ())
-
-  let test_41_0_42 () =
-    rec_decode(test_encode_41_0_42 ()) *)
-
+  let t4 ()
+  = rec_decode (rec_encode (-1) (Cons 41 (Cons 0 Nil)))
+  
+  let t5 ()
+  = rec_decode (rec_encode (-1) (Cons 0 (Cons 0 Nil)))
+  
+  let t6 ()
+  = rec_decode (rec_encode (-1) (Cons 0 (Cons 41 (Cons 0 Nil))))
+  
+  let t7 ()
+  = rec_decode (rec_encode (-1) (Cons 41 (Cons 42 (Cons 43 (Cons 41 (Cons 0 Nil))))))
 end
