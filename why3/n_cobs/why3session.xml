@@ -4,90 +4,147 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.13.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC5" version="1.0.1-dev.2.77d0bec48" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC5" version="1.1.2" alternative="strings" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.5.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="n_cobs.why"/>
 <theory name="NestedCobs">
- <goal name="next_decode&#39;vc" expl="VC for next_decode">
- <transf name="split_vc" >
-  <goal name="next_decode&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.032387" steps="7488"/></proof>
+ <goal name="rec_encode&#39;vc" expl="VC for rec_encode" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="rec_encode&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="3" obsolete="true"><result status="valid" time="0.041292" steps="8617"/></proof>
+  <proof prover="5" obsolete="true"><result status="valid" time="0.036767" steps="8639"/></proof>
+  <proof prover="6"><result status="valid" time="0.006380" steps="43"/></proof>
   </goal>
-  <goal name="next_decode&#39;vc.1" expl="precondition">
-  <proof prover="5"><result status="timeout" time="5.000000" steps="129121"/></proof>
-  </goal>
-  <goal name="next_decode&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.061806" steps="7488"/></proof>
-  </goal>
-  <goal name="next_decode&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.054541" steps="7730"/></proof>
-  </goal>
-  <goal name="next_decode&#39;vc.1" expl="precondition">
-  <proof prover="5"><undone/></proof>
-  </goal>
-  <goal name="next_decode&#39;vc.4" expl="precondition">
-  <proof prover="5"><undone/></proof>
-  </goal>
- </transf>
- </goal>
- <goal name="next_0&#39;vc" expl="VC for next_0">
- <transf name="split_vc" >
-  <goal name="next_0&#39;vc.0" expl="variant decrease">
-  <proof prover="5" obsolete="true"><result status="valid" time="0.031276" steps="7667"/></proof>
-  <proof prover="6" obsolete="true"><result status="valid" time="0.017246" steps="45"/></proof>
-  </goal>
-  <goal name="next_0&#39;vc.1" expl="assertion">
+  <goal name="rec_encode&#39;vc.1" expl="variant decrease" proved="true">
   <proof prover="0" obsolete="true"><result status="timeout" time="1.000000" steps="356270"/></proof>
   <proof prover="1" obsolete="true"><result status="timeout" time="1.000000" steps="2511267"/></proof>
   <proof prover="3" obsolete="true"><result status="valid" time="0.031416" steps="8094"/></proof>
   <proof prover="5" obsolete="true"><result status="valid" time="0.030058" steps="8115"/></proof>
-  <proof prover="6" timelimit="1" obsolete="true"><result status="timeout" time="1.000000" steps="12906"/></proof>
+  <proof prover="6"><result status="valid" time="0.006975" steps="49"/></proof>
   </goal>
-  <goal name="next_0&#39;vc.2" expl="assertion">
-  <proof prover="1" obsolete="true"><result status="valid" time="0.015355" steps="4423"/></proof>
-  <proof prover="3" obsolete="true"><result status="valid" time="0.019633" steps="8102"/></proof>
-  <proof prover="5" obsolete="true"><result status="valid" time="0.033400" steps="8123"/></proof>
+  <goal name="rec_encode&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="5" obsolete="true"><result status="valid" time="0.031276" steps="7667"/></proof>
+  <proof prover="6"><result status="valid" time="0.017246" steps="49"/></proof>
   </goal>
-  <goal name="next_0&#39;vc.3" expl="assertion">
-  <proof prover="0" obsolete="true"><result status="timeout" time="1.000000" steps="227672"/></proof>
-  <proof prover="1" obsolete="true"><result status="timeout" time="1.000000" steps="1578826"/></proof>
-  <proof prover="3" obsolete="true"><result status="valid" time="0.074948" steps="9826"/></proof>
-  <proof prover="5" obsolete="true"><result status="valid" time="0.053784" steps="9573"/></proof>
-  <proof prover="6" timelimit="1" obsolete="true"><result status="timeout" time="1.000000" steps="9170"/></proof>
-  </goal>
-  <goal name="next_0&#39;vc.4" expl="postcondition">
-  <proof prover="3" obsolete="true"><result status="valid" time="0.041292" steps="8617"/></proof>
-  <proof prover="5" obsolete="true"><result status="valid" time="0.036767" steps="8639"/></proof>
-  </goal>
-  <goal name="next_0&#39;vc.5" expl="postcondition">
-  <proof prover="3" obsolete="true"><result status="valid" time="0.148004" steps="25233"/></proof>
-  <proof prover="5" obsolete="true"><result status="timeout" time="5.000000" steps="240525"/></proof>
-  </goal>
-  <goal name="next_0&#39;vc.6" expl="postcondition">
-  <proof prover="3" obsolete="true"><result status="valid" time="0.060635" steps="10913"/></proof>
-  <proof prover="5" obsolete="true"><result status="valid" time="0.082433" steps="10661"/></proof>
+  <goal name="rec_encode&#39;vc.3" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="rec_encode&#39;vc.3.0" expl="postcondition" proved="true">
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.000000" steps="2248749"/></proof>
+   <transf name="split_vc" proved="true" >
+    <goal name="rec_encode&#39;vc.3.0.0" expl="postcondition" proved="true">
+    <proof prover="2" obsolete="true"><result status="timeout" time="5.000000" steps="2006746"/></proof>
+    <proof prover="6"><result status="valid" time="0.006735" steps="8"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="rec_encode&#39;vc.3.1" expl="postcondition" proved="true">
+   <proof prover="2" obsolete="true"><result status="timeout" time="5.000000" steps="6152182"/></proof>
+   <proof prover="6" obsolete="true"><result status="valid" time="0.006433" steps="8"/></proof>
+   <transf name="split_vc" proved="true" >
+    <goal name="rec_encode&#39;vc.3.1.0" expl="postcondition" proved="true">
+    <proof prover="6"><result status="valid" time="0.004805" steps="11"/></proof>
+    </goal>
+    <goal name="rec_encode&#39;vc.3.1.1" expl="postcondition" proved="true">
+    <proof prover="6" obsolete="true"><result status="timeout" time="5.000000" steps="128938"/></proof>
+    <transf name="split_vc" proved="true" >
+     <goal name="rec_encode&#39;vc.3.1.1.0" expl="postcondition" proved="true">
+     <proof prover="6"><result status="valid" time="0.008419" steps="13"/></proof>
+     </goal>
+     <goal name="rec_encode&#39;vc.3.1.1.1" expl="postcondition" proved="true">
+     <proof prover="6"><result status="valid" time="0.008974" steps="13"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
   </goal>
  </transf>
  </goal>
- <goal name="encode&#39;vc" expl="VC for encode">
+ <goal name="rec_decode&#39;vc" expl="VC for rec_decode" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="rec_decode&#39;vc.0" expl="unreachable point" proved="true">
+  <proof prover="6"><result status="valid" time="0.003854" steps="83"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="6"><result status="valid" time="0.003762" steps="87"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.017122" steps="267"/></proof>
+  </goal>
+  <goal name="rec_decode&#39;vc.3" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="rec_decode&#39;vc.3.0" expl="postcondition" proved="true">
+   <proof prover="6"><result status="valid" time="0.006634" steps="10"/></proof>
+   </goal>
+   <goal name="rec_decode&#39;vc.3.1" expl="postcondition" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="rec_decode&#39;vc.3.1.0" expl="postcondition" proved="true">
+    <proof prover="6"><result status="valid" time="0.006451" steps="16"/></proof>
+    </goal>
+    <goal name="rec_decode&#39;vc.3.1.1" expl="postcondition" proved="true">
+    <proof prover="6"><result status="valid" time="0.010563" steps="20"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="strip_end&#39;vc" expl="VC for strip_end" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="strip_end&#39;vc.0" expl="unreachable point" proved="true">
+  <proof prover="6"><result status="valid" time="0.003334" steps="2"/></proof>
+  </goal>
+  <goal name="strip_end&#39;vc.1" expl="variant decrease" proved="true">
+  <proof prover="6"><result status="valid" time="0.003303" steps="21"/></proof>
+  </goal>
+  <goal name="strip_end&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.006769" steps="18"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="encode&#39;vc" expl="VC for encode" proved="true">
+ <transf name="split_vc" proved="true" >
+ </transf>
+ </goal>
+ <goal name="decode&#39;vc" expl="VC for decode" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="decode&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.007018" steps="6"/></proof>
+  </goal>
+  <goal name="decode&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="6"><result status="valid" time="0.006737" steps="6"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="gen_a&#39;vc" expl="VC for gen_a" proved="true">
+ <proof prover="6"><result status="valid" time="0.006744" steps="9"/></proof>
+ </goal>
+ <goal name="gen_a0&#39;vc" expl="VC for gen_a0" proved="true">
  <proof prover="5" obsolete="true"><result status="valid" time="0.048896" steps="10660"/></proof>
+ <proof prover="6"><result status="valid" time="0.006455" steps="10"/></proof>
  </goal>
- <goal name="decode&#39;vc" expl="VC for decode">
- <proof prover="5" obsolete="true"><result status="timeout" time="5.000000" steps="376821"/></proof>
- <transf name="split_vc" >
-  <goal name="decode&#39;vc.0" expl="unreachable point">
-  <proof prover="6" obsolete="true"><result status="valid" time="0.014268" steps="19"/></proof>
-  </goal>
-  <goal name="decode&#39;vc.1" expl="precondition">
-  </goal>
-  <goal name="decode&#39;vc.1" expl="precondition">
-  <proof prover="6"><result status="timeout" time="5.000000" steps="100529"/></proof>
-  </goal>
- </transf>
+ <goal name="test_encode_a&#39;vc" expl="VC for test_encode_a" proved="true">
+ <proof prover="6"><result status="valid" time="0.005888" steps="1"/></proof>
  </goal>
- <goal name="en_de">
+ <goal name="test_encode_0a&#39;vc" expl="VC for test_encode_0a" proved="true">
+ <proof prover="6"><result status="valid" time="0.003979" steps="1"/></proof>
+ </goal>
+ <goal name="test_encode_am&#39;vc" expl="VC for test_encode_am">
+ <proof prover="6"><result status="timeout" time="5.000000" steps="147075"/></proof>
+ </goal>
+ <goal name="test_encode_0am&#39;vc" expl="VC for test_encode_0am">
+ <proof prover="6"><result status="timeout" time="5.000000" steps="146142"/></proof>
+ </goal>
+ <goal name="test_mod&#39;vc" expl="VC for test_mod">
+ <proof prover="6"><result status="timeout" time="5.000000" steps="145132"/></proof>
+ </goal>
+ <goal name="test_decode&#39;vc" expl="VC for test_decode">
+ <proof prover="6"><result status="timeout" time="5.000000" steps="171463"/></proof>
  </goal>
 </theory>
 </file>
