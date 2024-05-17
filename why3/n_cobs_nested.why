@@ -1,0 +1,63 @@
+module Nesting
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.NthNoOpt
+  use list.Length
+  use list.Append
+  use list.Mem
+  
+  (*
+  let rec function dec (l: list int): list (list int)
+  *)
+  
+  (*
+  function random_split (l: list int): (list int, list int)
+  
+  axiom split:
+    
+  
+  let rec function enc (ll: list (list int)): list int
+    requires { forall l:list int. mem l ll -> not (mem 0 l) } 
+  = match ll with
+    | Nil -> Nil
+    | Cons le lll -> le ++ (Cons 0 Nil) ++ 
+  
+   *)
+   
+  let rec function skip (l: list int) (n: int): list int
+  = if n = 0 then l 
+    else
+      match l with
+      | Nil -> Nil
+      | Cons e ll -> skip ll (n - 1)
+      end 
+   
+  let t() =
+    skip (Cons 42 (Cons 43 Nil)) 1
+    
+  let rec function rec_decode (cl: list int) (n: int): list int
+    variant { cl }
+  = if n = -1 then Nil
+    else
+      match cl with
+      | Nil -> absurd
+      | Cons cn cll -> 
+        if cn = 0 then
+          match cll with 
+          | Nil -> absurd
+          | Cons c0n c0ll -> 
+            let inner = rec_decode c0ll c0n in
+            rec_decode (skip c0ll ((length inner))) n  
+          end 
+        else
+          if n = 1 then Cons 0 (rec_decode cll cn)
+          else Cons cn (rec_decode cll (if n > 0 then n - 1 else n + 1))
+      end
+        
+   let t2() =
+    let b = Cons 0 (Cons (1) (Cons (-2) (Cons 78 Nil))) in
+    rec_decode ((Cons 41 Nil) ++ b ++ (Cons (-3) Nil) ++ b ++ (Cons 42 (Cons 43 Nil))) (2)
+  
+end
