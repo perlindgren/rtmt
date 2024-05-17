@@ -6,6 +6,7 @@ module NestedCobs
   use list.NthNoOpt
   use list.Length
   use list.Append
+  use list.Mem
   use int.ComputerDivision
 
   let rec function rec_decode (cl: list int) : (int, list int)
@@ -25,6 +26,7 @@ module NestedCobs
     variant { pl } 
     ensures { result <> Nil }
     ensures { length result = 1 + length pl }
+    ensures { not (mem 0 result) }
     ensures { 
       let dn, dl = rec_decode result in
       (dn = pn) /\ (dl = pl)
