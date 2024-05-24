@@ -36,16 +36,16 @@ impl NcDecode {
 
         loop {
             if is_next_end && p == next {
-                println!("p {}, offset {}, next {}", p, offset, next);
+                // println!("p {}, offset {}, next {}", p, offset, next);
                 if offset == -128 {
                     offset = self.in_buf[p as usize];
                     is_next_end = offset.is_negative();
                     next += offset as i32;
                     p -= 1;
-                    println!(
-                        "offset {}, is_next_end {}, next {}, p {}",
-                        offset, is_next_end, next, p
-                    );
+                    // println!(
+                    //     "offset {}, is_next_end {}, next {}, p {}",
+                    //     offset, is_next_end, next, p
+                    // );
                     continue;
                 } else {
                     return p;

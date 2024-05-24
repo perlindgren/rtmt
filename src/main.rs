@@ -37,15 +37,18 @@ fn main() -> Result<(), std::io::Error> {
             Ok(0) => panic!("[0]"),
             Ok(n) => {
                 for b in &buffer[0..n] {
-                    print!("{:#03x} ", *b);
+                    // println!("{:#03x}({}), ", *b, *b);
                     if let Some(frame_start) = de.decode(*b as i8) {
-                        let s: Vec<u8> = de.out_buf.iter().map(|i| *i as u8).collect();
-                        println!("---- str {:?}", std::str::from_utf8(&s));
+                        println!("{:?}", de.out_buf);
+                        // let s: Vec<u8> = de.out_buf.iter().map(|i| *i as u8).collect();
+                        // println!("---- str {:?}", std::str::from_utf8(&s));
                         if frame_start == -1 {
                             // clear both receive buffer and output buffer
                             // when outermost frame received
                             de.clear_out();
                             de.clear_in();
+                        } else {
+                            de.clear_out();
                         }
                     }
                 }
