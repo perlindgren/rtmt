@@ -45,6 +45,10 @@ Toolchain: `leanprover/lean4:v4.34.1`. **No dependencies** -- core Lean only.
 | what the spec allows, the receiver accepts | `wfCodeword_of_encodes` |
 | what the receiver accepts, the spec allows | `encodes_of_wfCodeword` |
 | **those two are the same set of codewords** | `encodes_iff` |
+| an interruption leaves the interrupted frame's state intact | `Nesting.emit_state_eq` |
+| excising nested segments leaves the plain codeword | `Nesting.erase_eq`, `Nesting.own_eq_encode` |
+| the outer payload round-trips through nesting | `Nesting.immediate` |
+| the skip distance, in codeword bytes | `Nesting.wire_length` |
 
 Axioms: `propext`, `Quot.sound`, and `Classical.choice` in the few lemmas that
 reach `Int8.ofInt_toInt`. No `sorryAx` anywhere. The `Online` results need
@@ -62,6 +66,8 @@ kernel-verified -- it trusts the compiler, and each such theorem carries a
 - `Ncobs/Encode.lean` -- batch encoder, `fits`, derived 126-byte bound.
 - `Ncobs/Decode.lean` -- right-to-left decoder, reversibility.
 - `Ncobs/Online.lean` -- the incremental machine, and why it equals the batch one.
+- `Ncobs/Nested.lean` -- nested transcripts: LIFO by construction, splice semantics,
+  the excision theorem, and the skip distance.
 - `Ncobs/WF.lean` -- codeword well-formedness: the receiver's own walk, and
   `encodes_iff`.
 - `Ncobs/Test.lean` -- exhaustive checks, and the 126/127 boundary.
@@ -169,6 +175,55 @@ That is `native_decide`, so it validates the statement rather than the proof -- 
 is the check that would have caught a misstated theorem, which is worth something
 given that the first version of the predicate was misstated and a sweep caught it.
 
+## Nesting
+
+A low-priority frame is being streamed; a higher-priority frame starts, runs to
+completion, and control returns to the interrupted frame *mid-codeword*. On the wire
+the nested frame's codeword is spliced into the middle of the outer one's. The outer
+offsets are frame-relative, so the splice breaks them as absolute positions, and the
+receiver repairs this by shifting its target by however many bytes it skipped --
+`next -= p - new_p` in the reference decoder.
+
+`Nesting.Tr` is the transcript type, and LIFO is a property of the type rather than a
+hypothesis: `cut pre inner rest` hands control to a complete frame `inner` and gets it
+back at `rest`, which is the *same* frame continuing. There is no constructor that ends
+a frame and later resumes another, so the interleaving the README rules out by hand
+(`sf1 · encode f1 · sf2 · ef1 · encode f2 · ef2`) has no term. Repeated preemption of
+one frame is expressible because `rest` may itself be a `cut`. The price is that a frame
+which never calls `end_frame` is also inexpressible, so the hung-frame liveness claim
+cannot be stated in this model; it needs a `hang` constructor and a receiver.
+
+Three results carry the milestone:
+
+- **`emit_state_eq`** -- the interrupted frame's machine state at its end does not
+  depend on what was nested inside it. This is why online nesting is possible at all:
+  `step` leaves `State` complete between every two bytes, so a splice needs no
+  cooperation from the frame it splices into.
+- **`erase_eq` / `own_eq_encode`** -- excise the nested segments from a frame's wire and
+  what remains is *exactly* `encode (outer t)`, the ordinary codeword of the frame's own
+  payload. Nothing about the nested frame appears in the statement. The content is
+  `stream_append`: the outer counter survives the interruption, so the offsets emitted
+  before the splice and after it belong to one consistent encoding. Everything else
+  about nesting is bookkeeping on top of this.
+- **`wire_length`** -- the wire carries the frame's own `payload + 2` bytes (`+1`
+  terminating offset, `+1` sentinel, which the README does not count as overhead) plus
+  exactly the nested segments' bytes. This is the skip distance in *codeword* bytes,
+  which is the quantity the receiver's compensation needs; `n_cobs_nested.why` reasons
+  with the decoded length instead and never states the relation.
+
+`immediate` gives the round trip: `decodeFrame (ownOf t) = outer t`. Note what it is
+*not*: `decodeFrame (wireOf t)` is false in general, because the first sentinel in a
+nested wire belongs to a nested frame. Framing a nested stream needs the receiver's
+skip-compensating scan, not `takeWhile`.
+
+The two worked examples in the protocol README are in the file as `rfl`, and match
+byte for byte under the Rust and Why3 sign convention (theirs is the opposite sign, so
+flipping every offset reproduces their tables): frame `A B` preempted after `A` by `a`
+gives `A a -2 0 B -3 0`, and frame `0 0` preempted after the first `0` by `0` gives
+`-1 -1 1 0 1 1 0`. Beyond those, three `native_decide` sweeps over 1,010 generated
+transcripts -- including nesting two frames deep -- check the round trip, the excision
+identity, and the length relation against the independent decoder.
+
 ## A retracted argument
 
 I previously argued that the README's sign convention is impossible because its
@@ -180,16 +235,18 @@ is the intended one. The choice is still yours.
 
 ## Not yet formalized
 
-- **Nesting / preemption.** Needs an inductive type of well-bracketed frame
-  stacks so the LIFO discipline holds by construction and `sf1 · encode f1 · sf2
-  · ef1` is not a representable term. `Encodes.length` is the lemma the
-  skip-distance argument rests on; `n_cobs_nested.why` uses the *decoded* length
-  and never states the relation, which is a large part of why it never closed.
+- **The receiver's nested scan.** The sender side of nesting is done (`Nesting`):
+  the transcript model, the excision theorem, the skip distance. What is missing is
+  the functional counterpart of `scan_frame` -- the right-to-left walk that consumes
+  a nested frame at a data-position `0` and shifts its target by the bytes it
+  skipped -- plus the lemma that justifies it: no offset in a frame's codeword
+  points outside that frame's own segment. That containment is exactly what makes
+  acting at a sentinel safe without looking left.
 - **Long frames and `-128` chaining**, including the encoder's need to know the
   frame size in advance to place the marker.
-- **Receiver-side preemption.** The sender's incrementality is now proven
-  (`Online`). The receiver's claim -- that a frame is reconstructible the moment
-  its sentinel arrives, no matter what arrived in between -- is not, and it is
-  the nesting milestone.
+- **Receiver-side incrementality.** The sender's is proven (`Online`), and the
+  per-frame payload round trip through nesting is proven (`Nesting.immediate`). That
+  a frame is reconstructible *the instant* its sentinel arrives, mid-stream, is a
+  claim about the scan above, not about the codec.
 - **Liveness**: a frame that never calls `end_frame` still lets every
   higher-priority frame through. Needs a stream model, not a codec one.
