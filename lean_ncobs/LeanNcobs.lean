@@ -2,4 +2,5 @@
 import LeanNcobs.Ncobs.Decode
 import LeanNcobs.Ncobs.Online
 import LeanNcobs.Ncobs.Nested
+import LeanNcobs.Ncobs.Scan
 import LeanNcobs.Ncobs.Test

@@ -49,6 +49,9 @@ Toolchain: `leanprover/lean4:v4.34.1`. **No dependencies** -- core Lean only.
 | excising nested segments leaves the plain codeword | `Nesting.erase_eq`, `Nesting.own_eq_encode` |
 | the outer payload round-trips through nesting | `Nesting.immediate` |
 | the skip distance, in codeword bytes | `Nesting.wire_length` |
+| the scan reproduces both reference decode tables | `Scan`, by `native_decide` |
+| the scan never reaches left of its own frame | `Scan.scan_contained`, `Scan.scan_contained2` |
+| the scan hands up exactly the frames that ran, in order | `Scan.scan_stream_of_wire`, `..._of_wire2` |
 
 Axioms: `propext`, `Quot.sound`, and `Classical.choice` in the few lemmas that
 reach `Int8.ofInt_toInt`. No `sorryAx` anywhere. The `Online` results need
@@ -68,6 +71,8 @@ kernel-verified -- it trusts the compiler, and each such theorem carries a
 - `Ncobs/Online.lean` -- the incremental machine, and why it equals the batch one.
 - `Ncobs/Nested.lean` -- nested transcripts: LIFO by construction, splice semantics,
   the excision theorem, and the skip distance.
+- `Ncobs/Scan.lean` -- the receiver's `scan_frame` as a functional walk, with the
+  skip compensation and the containment flag.
 - `Ncobs/WF.lean` -- codeword well-formedness: the receiver's own walk, and
   `encodes_iff`.
 - `Ncobs/Test.lean` -- exhaustive checks, and the 126/127 boundary.
@@ -224,6 +229,74 @@ gives `A a -2 0 B -3 0`, and frame `0 0` preempted after the first `0` by `0` gi
 transcripts -- including nesting two frames deep -- check the round trip, the excision
 identity, and the length relation against the independent decoder.
 
+## The receiver's scan
+
+`Scan.lean` is `scan_frame` transcribed into Lean: a right-to-left walk over the
+received bytes, carrying a *budget* of this frame's own bytes until the next
+landmark, and a flag saying whether that landmark is the frame's own boundary (the
+offset that led here was negative) or a slot where a payload zero had been replaced.
+
+Two transcription choices are worth their own sentence each.
+
+The **branch order is copied**, including the one that looks like a typo: the test
+for a sentinel byte comes *before* the zero-replacement test, so a nested frame's
+sentinel meeting the walk exactly at a landmark is read as a nested frame rather
+than as an offset byte. Rearranging those two branches changes which frames decode.
+
+The **budget is in the frame's own bytes**, which is what makes the compensation a
+non-event: at a nested block the walk recurses, drops the block, and continues with
+the budget it already had. There is no `next -= p - new_p` arithmetic anywhere in the
+model because the quantity that needed correcting was never disturbed in the first
+place. Reversed lists make the same point geometrically -- the compensation is a
+`drop`, and the bytes it removes never enter the budget.
+
+To make containment statable rather than merely observable, `Result` carries the
+walk's *residual state*: the budget left unspent, and the flag at the moment it
+stopped. The frame is contained exactly when it lands on its own boundary with
+nothing left:
+
+```
+def isComplete (r : Result) : Bool := r.left == 0 && r.atEnd
+```
+
+What is established, and how:
+
+| | |
+|---|---|
+| both README decode tables reproduce | `native_decide`, byte-exact |
+| payload recovery, containment, delivery order | `native_decide` over 1,010 depth-1 and 101,000 depth-2 transcripts |
+| containment is not vacuous | `scanComplete [66, -3, 0] = false`: an offset claiming three bytes with one present |
+
+**These are checks, not proofs.** The nesting results above are theorems; the scan's
+correctness is computation over 102,010 wires plus the two tables by hand. That is a
+real difference in kind and the file says so.
+
+### Where the walk stops short
+
+The obvious strengthening of containment -- that the scan consumes *exactly* the
+frame's own wire -- is false. The smallest instance is an empty frame interrupted by
+an empty frame:
+
+```
+wireOf (cut [] (fin []) [])     = [-1, 0, -1, 0]
+scanPayload [-1, 0, -1, 0]      = []           -- correct
+scanConsumed [-1, 0, -1, 0]     = 2            -- not 4
+```
+
+The outer frame's terminating offset is `-1`, so its boundary is the very next byte
+left, which is the nested frame's sentinel; the boundary test fires before the nested
+test and the block is never visited. **The reference decoder does exactly the same
+thing** -- `next = p - |offset|`, and `p == next` with a negative offset returns at
+once -- so this is a property of the protocol, not of the transcription.
+
+It is also harmless, and that claim is checked rather than waved at: the unvisited
+block lies to the *left* of where the scan stopped, so the enclosing scan meets the
+same sentinel and takes the block as its own nested child; nothing is delivered twice
+because a frame consumed as a block emits no output, its payload having gone out when
+its own sentinel arrived. The depth-2 sweep is aimed precisely at this: 10,000
+transcripts with the pathological shape under a parent frame, all three properties
+holding.
+
 ## A retracted argument
 
 I previously argued that the README's sign convention is impossible because its
@@ -235,13 +308,13 @@ is the intended one. The choice is still yours.
 
 ## Not yet formalized
 
-- **The receiver's nested scan.** The sender side of nesting is done (`Nesting`):
-  the transcript model, the excision theorem, the skip distance. What is missing is
-  the functional counterpart of `scan_frame` -- the right-to-left walk that consumes
-  a nested frame at a data-position `0` and shifts its target by the bytes it
-  skipped -- plus the lemma that justifies it: no offset in a frame's codeword
-  points outside that frame's own segment. That containment is exactly what makes
-  acting at a sentinel safe without looking left.
+- **A proof that the scan is correct.** The scan exists and is checked on 102,010
+  nested wires, but containment is not *proved*. The induction needs one invariant
+  tying the walk's budget to the encoder's counter: if `stream c s = (e, c')`, then
+  scanning `reverse e` entered with budget `|c'| - 1` recovers `s` and lands with
+  residual `|c|` and the sign of `c` as its flag. Given that, the splice argument
+  goes through and containment follows for every transcript. The `Result` residual
+  fields exist to make that invariant expressible; the invariant itself is the gap.
 - **Long frames and `-128` chaining**, including the encoder's need to know the
   frame size in advance to place the marker.
 - **Receiver-side incrementality.** The sender's is proven (`Online`), and the
