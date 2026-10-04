@@ -1,0 +1,10 @@
+name = "lean_ncobs"
+version = "0.1.0"
+defaultTargets = ["lean_ncobs"]
+
+[[lean_lib]]
+name = "LeanNcobs"
+
+[[lean_exe]]
+name = "lean_ncobs"
+root = "Main"
